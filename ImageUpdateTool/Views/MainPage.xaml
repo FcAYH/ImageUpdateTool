@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:ImageUpdateTool.Models"
+             x:Class="ImageUpdateTool.Views.MainPage"
+             Title="MainPage">
+    <ContentPage.BindingContext>
+        <models:ImageRepo/>
+    </ContentPage.BindingContext>
+    
+    <VerticalStackLayout>
+        <Button Text="Git Pull" Clicked="GitPullButton_Clicked"/>
+        <Button Text="Select Image" Clicked="SelectImageButton_Clicked"/>
+        <Button Text="{Binding LastestImageUrl}" Clicked="CopyUrlButton_Clicked"/>
+    </VerticalStackLayout>
+</ContentPage>
