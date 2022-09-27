@@ -12,7 +12,7 @@ internal class ImageRepo
     public string LastestImageUrl { get; private set; }
     public string LocalRepoPath { get { return _localRepoPath; } }
 
-    private const string URL_PREFIX = "https://raw.githubusercontent.com/FcAYH/Images/master/";
+    private const string URL_PREFIX = "https://cdn.jsdelivr.net/gh/FcAYH/Images/";
     private const string GIT_REPO_URL = "https://github.com/FcAYH/Images.git";
     private const string USER_NAME = "FcAYH";
     private const string USER_EMAIL = "1473988037@qq.com";
@@ -20,20 +20,20 @@ internal class ImageRepo
     private const string REPO_FOLDER_NAME = "Images";
 
     private string _applicationFolderPath = "";
-    private string _localRepoPath = "C:\\Users\\F_CIL\\AppData\\Local\\Packages\\C9481A9D-76F1-41AF-90C4-B5EBB33523A6_9zz4h110yvjzm\\LocalCache\\Local\\ImageUpdateTool_GitRepos\\Images";
+    private string _localRepoPath = "";
 
     private Logic.CommandRunner _gitProcess;
 
     public ImageRepo()
     {
-        string localPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string localPath = FileSystem.AppDataDirectory;
         _applicationFolderPath = Path.Combine(localPath, ROOT_FOLDER_NAME);
-        //_localRepoPath = Path.Combine(_applicationFolderPath, REPO_FOLDER_NAME);
+        _localRepoPath = Path.Combine(_applicationFolderPath, REPO_FOLDER_NAME);
 
         if (!Directory.Exists(_applicationFolderPath))
             Directory.CreateDirectory(_applicationFolderPath);
 
-        _gitProcess = new("git", @"C:\Users\F_CIL\AppData\Local\Packages\C9481A9D-76F1-41AF-90C4-B5EBB33523A6_9zz4h110yvjzm\LocalCache\Local\ImageUpdateTool_GitRepos\Images");
+        _gitProcess = new("git", _localRepoPath);
     }
 
     public string CallGitPull()

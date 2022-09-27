@@ -22,9 +22,10 @@ namespace ImageUpdateTool.Logic
         {
             var info = new ProcessStartInfo(ExecutablePath, arguments)
             {
-                CreateNoWindow = false,
-                RedirectStandardOutput = false,
-                UseShellExecute = true,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
                 WorkingDirectory = WorkingDirectory,
             };
             var process = new Process
@@ -32,7 +33,11 @@ namespace ImageUpdateTool.Logic
                 StartInfo = info,
             };
             process.Start();
-            return "";// process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            if (process.ExitCode == 0)
+                return "";
+                    
+            return process.StandardError.ReadToEnd();
         }
     }
 }

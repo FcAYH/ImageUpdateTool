@@ -8,9 +8,10 @@
         <models:ImageRepo/>
     </ContentPage.BindingContext>
     
-    <VerticalStackLayout>
+    <VerticalStackLayout Padding="10" Spacing="10">
         <Button Text="Git Pull" Clicked="GitPullButton_Clicked"/>
         <Button Text="Select Image" Clicked="SelectImageButton_Clicked"/>
-        <Button Text="{Binding LastestImageUrl}" Clicked="CopyUrlButton_Clicked"/>
+        <Button x:Name="CopyURLButton" Text="Copy URL" Clicked="CopyUrlButton_Clicked" IsEnabled="False"/>
+        <Button x:Name="RetryButton" Text="Retry" Clicked="OnRetry_Clicked"/>
     </VerticalStackLayout>
 </ContentPage>

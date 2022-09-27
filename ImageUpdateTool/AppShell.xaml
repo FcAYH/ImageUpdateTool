@@ -3,19 +3,16 @@
     x:Class="ImageUpdateTool.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:ImageUpdateTool"
-    xmlns:views="clr-namespace:ImageUpdateTool.Views"
-    Shell.FlyoutBehavior="Disabled">
-    <TabBar>
+    xmlns:views="clr-namespace:ImageUpdateTool.Views">
+    
+    <FlyoutItem Title="Repos" Icon="icon_notes.png">
         <ShellContent
-            Title="Images"
-            ContentTemplate="{DataTemplate views:MainPage}"
-            />
+            Title="Github"
+            ContentTemplate="{DataTemplate views:MainPage}"/>
+    </FlyoutItem>
 
-        <ShellContent
-            Title="About"
-            ContentTemplate="{DataTemplate views:AboutPage}"
-            Route="AboutPage"
-            Icon="icon_about"/>
-    </TabBar>
+    <FlyoutItem Title="About" Icon="icon_about.png">
+        <ShellContent ContentTemplate="{DataTemplate views:AboutPage}"/>
+    </FlyoutItem>
+    
 </Shell>
