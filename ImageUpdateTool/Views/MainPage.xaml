@@ -13,5 +13,6 @@
         <Button Text="Select Image" Clicked="SelectImageButton_Clicked"/>
         <Button x:Name="CopyURLButton" Text="Copy URL" Clicked="CopyUrlButton_Clicked" IsEnabled="False"/>
         <Button x:Name="RetryButton" Text="Retry" Clicked="OnRetry_Clicked"/>
+        <Button x:Name="OpenRepoButton" Text="Open Repository Folder" Clicked="OnOpenRepoButton_Clicked"/>
     </VerticalStackLayout>
 </ContentPage>

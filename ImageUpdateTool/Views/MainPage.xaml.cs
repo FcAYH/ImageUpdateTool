@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -31,10 +32,57 @@ public partial class MainPage : ContentPage
 	{
 		InitializeComponent();
 
+		InitializeGitStatus();
 		_imageRepo = (Models.ImageRepo)BindingContext;
 	}
 
-	private async void GitPullButton_Clicked(object sender, EventArgs e)
+	protected override void OnAppearing()
+	{
+		base.OnAppearing();
+
+        Window.Destroying += Window_Destroying;
+    }
+
+	private void Window_Destroying(object sender, EventArgs e)
+	{
+		SaveGitStatus();
+	}
+
+	private void InitializeGitStatus()
+	{
+		string localPath = FileSystem.AppDataDirectory;
+		string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
+
+		if (!File.Exists(statusSavePath))
+		{
+			File.Create(statusSavePath);
+			Status = GitStatus.Success;
+		}
+		else
+		{
+			string status = File.ReadAllText(statusSavePath);
+			try
+			{
+				Status = (GitStatus)Enum.Parse(typeof(GitStatus), status);
+			}
+			catch(Exception)
+			{
+				Status = GitStatus.Success;
+			}
+		}
+	}
+
+	public void SaveGitStatus()
+	{
+        string localPath = FileSystem.AppDataDirectory;
+        string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
+
+        if (!File.Exists(statusSavePath))
+            File.Create(statusSavePath);
+        File.WriteAllText(statusSavePath, Status.ToString());
+    }
+
+    private async void GitPullButton_Clicked(object sender, EventArgs e)
 	{
 		string error = _imageRepo.CallGitPull();
 		if (!string.IsNullOrEmpty(error))
@@ -129,6 +177,11 @@ public partial class MainPage : ContentPage
                 Status = GitStatus.FailToPull;
                 await DisplayAlert("Error", "拉取仓库内容失败，请检查网络后点击Retry", "Yes");
             }
+			else
+			{
+                Status = GitStatus.Success;
+                await DisplayAlert("Success", "拉取完成", "Yes");
+            }
         }
 
 		if (Status == GitStatus.FailToAdd)
@@ -164,6 +217,16 @@ public partial class MainPage : ContentPage
                 await DisplayAlert("Error", $"推送修改失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
                 return;
             }
+			else
+			{
+                Status = GitStatus.Success;
+                await DisplayAlert("Success", "上传成功", "Yes");
+            }
         }
+	}
+
+	private void OnOpenRepoButton_Clicked(object sender, EventArgs e)
+	{
+		Process.Start("explorer.exe", _imageRepo.LocalRepoPath);
 	}
 }
