@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:ImageUpdateTool.Controls"
+             x:Class="ImageUpdateTool.Views.ResourceManageList">
+    <ContentView.Resources>
+        <Style TargetType="controls:FolderButton"
+            x:Key="FolderButton">
+            <!-- 
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="BackgroundColor" Value="WhiteSmoke"/>
+            -->
+            
+            <Setter Property="HeightRequest" Value="25"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+            <Setter Property="Padding" Value="5, 0, 0, 0"/>
+            
+            <Setter Property="HorizontalOptions" Value="Start"/>
+            <Setter Property="HorizontalTextAlignment" Value="Start"/>
+            <Setter Property="WidthRequest" Value="100"/>
+        </Style>
+    </ContentView.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout x:Name="Directories" Spacing="1">
+    
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

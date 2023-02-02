@@ -83,21 +83,37 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\blank.png" />
+	  <None Remove="Resources\Images\collpsedglyph.png" />
+	  <None Remove="Resources\Images\folder.png" />
+	  <None Remove="Resources\Images\folderclosed.png" />
+	  <None Remove="Resources\Images\folderopen.png" />
 	  <None Remove="Resources\Images\icon_about.png" />
 	  <None Remove="Resources\Images\icon_notes.png" />
+	  <None Remove="Resources\Images\item.png" />
+	  <None Remove="Resources\Images\openglyph.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\AboutPage.xaml.cs">
+	  <Compile Update="Pages\AboutPage.xaml.cs">
 	    <DependentUpon>AboutPage.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\ResourceManageList.xaml.cs">
+	    <DependentUpon>ResourceManageList.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\AboutPage.xaml">
+	  <MauiXaml Update="Pages\AboutPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\MainPage.xaml">
+	  <MauiXaml Update="Pages\MainPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\TreeViweDisplay.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\ResourceManageList.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

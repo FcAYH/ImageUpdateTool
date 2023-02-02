@@ -1,4 +1,4 @@
-namespace ImageUpdateTool.Views;
+namespace ImageUpdateTool.Pages;
 
 public partial class AboutPage : ContentPage
 {

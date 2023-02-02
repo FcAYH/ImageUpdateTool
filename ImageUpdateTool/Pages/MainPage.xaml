@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:ImageUpdateTool.Models"
+             xmlns:views="clr-namespace:ImageUpdateTool.Views"
+             xmlns:controls="clr-namespace:ImageUpdateTool.Controls"
+             x:Class="ImageUpdateTool.Pages.MainPage"
+             Title="Github Repo">
+    <ContentPage.BindingContext>
+        <models:ImageRepo/>
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <Style TargetType="Button" x:Key="FunctionButton">
+            <Setter Property="MaximumWidthRequest" Value="200"/>
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*, 40" RowSpacing="10" 
+          ColumnDefinitions="*, *, *, *, *" ColumnSpacing="10"
+          Padding="10">
+        <controls:TreeView x:Name="FolderList" Margin="5" 
+                           Grid.Row="0" Grid.Column="0"/>
+
+
+        <ScrollView Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4">
+                
+        </ScrollView>   
+        
+        <Button Grid.Row="1" Grid.Column="0" Text="Git Pull" 
+                Clicked="GitPullButton_Clicked" Style="{StaticResource FunctionButton}"/>
+        <Button Grid.Row="1" Grid.Column="1" Text="Select Image" 
+                Clicked="SelectImageButton_Clicked" Style="{StaticResource FunctionButton}"/>
+        <Button Grid.Row="1" Grid.Column="2" x:Name="CopyURLButton" Text="Copy URL" 
+                Clicked="CopyUrlButton_Clicked" IsEnabled="False" Style="{StaticResource FunctionButton}"/>
+        <Button Grid.Row="1" Grid.Column="3" x:Name="RetryButton" Text="Retry" 
+                Clicked="OnRetry_Clicked" Style="{StaticResource FunctionButton}"/>
+        <Button Grid.Row="1" Grid.Column="4" x:Name="OpenRepoButton" Text="Open Repository Folder" 
+                Clicked="OnOpenRepoButton_Clicked" Style="{StaticResource FunctionButton}"/>
+    </Grid>
+</ContentPage>

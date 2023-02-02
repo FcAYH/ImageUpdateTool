@@ -1,4 +1,6 @@
-﻿namespace ImageUpdateTool;
+﻿using ImageUpdateTool.Pages;
+
+namespace ImageUpdateTool;
 
 public static class MauiProgram
 {

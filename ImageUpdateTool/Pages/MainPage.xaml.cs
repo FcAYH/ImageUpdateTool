@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using Item = ImageUpdateTool.Models.TreeView.Item;
+using Group = ImageUpdateTool.Models.TreeView.Group;
 
-namespace ImageUpdateTool.Views;
+namespace ImageUpdateTool.Pages;
 
 public partial class MainPage : ContentPage
 {
@@ -30,11 +32,12 @@ public partial class MainPage : ContentPage
 
     public MainPage()
 	{
-		InitializeComponent();
-
+        InitializeComponent();
 		InitializeGitStatus();
-		_imageRepo = (Models.ImageRepo)BindingContext;
-	}
+        _imageRepo = (Models.ImageRepo)BindingContext;
+
+		InitializeFolderList();
+    }
 
 	protected override void OnAppearing()
 	{
@@ -48,7 +51,30 @@ public partial class MainPage : ContentPage
 		SaveGitStatus();
 	}
 
-	private void InitializeGitStatus()
+    private void InitializeFolderList()
+    {
+        DirectoryInfo repoDir = new DirectoryInfo(_imageRepo.LocalRepoPath);
+
+		Group rootGroup = new();
+		rootGroup.Name = "Github Repo";
+
+        GenerateGroup(rootGroup, repoDir);
+
+		FolderList.RootNodes = FolderList.ProcessGroups(rootGroup);
+    }
+
+	private void GenerateGroup(Group parent, DirectoryInfo directory)
+	{
+		foreach (var dir in directory.GetDirectories())
+		{
+			Group group = new();
+			group.Name = dir.Name;
+			parent.Children.Add(group);
+			GenerateGroup(group, dir);
+		}
+	}
+
+    private void InitializeGitStatus()
 	{
 		string localPath = FileSystem.AppDataDirectory;
 		string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
