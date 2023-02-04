@@ -4,6 +4,7 @@
              xmlns:models="clr-namespace:ImageUpdateTool.Models"
              xmlns:views="clr-namespace:ImageUpdateTool.Views"
              xmlns:controls="clr-namespace:ImageUpdateTool.Controls"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Pages.MainPage"
              Title="Github Repo">
     <ContentPage.BindingContext>
@@ -19,8 +20,37 @@
     <Grid RowDefinitions="*, 40" RowSpacing="10" 
           ColumnDefinitions="*, *, *, *, *" ColumnSpacing="10"
           Padding="10">
-        <controls:TreeView x:Name="FolderList" Margin="5" 
-                           Grid.Row="0" Grid.Column="0"/>
+        <ScrollView Grid.Row="0" Grid.Column="0">
+            <material:TreeView x:Name="FolderTree" Spacing="5" Padding="5">
+                <material:TreeView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="20" 
+                              ColumnDefinitions="25, 30, 141" 
+                              HorizontalOptions="Fill"
+                              Margin="-19, 0, 0, 0"
+                              >
+                            <Label x:Name="FolderIcon" Text="📁"
+                                   Margin="0"
+                                   Grid.Row="0" Grid.Column="1"/>
+                            <Label Text="{Binding Name}"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Start"
+                                   Grid.Row="0" Grid.Column="2"/>
+                            <Button HorizontalOptions="Start"
+                                    Padding="0"
+                                    StyleClass="TextButton"
+                                    HeightRequest="20"
+                                    WidthRequest="{Binding ButtonWidthRequest}"
+                                    CornerRadius="5"
+                                    Clicked="FolderButton_Cilcked"
+                                    Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                                    />
+                        </Grid>
+                    </DataTemplate>
+                </material:TreeView.ItemTemplate>
+            </material:TreeView>
+        </ScrollView>
+        
 
 
         <ScrollView Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4">

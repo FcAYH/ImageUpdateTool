@@ -95,6 +95,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="UraniumUI" Version="2.3.0" />
+	  <PackageReference Include="UraniumUI.Icons.FontAwesome" Version="2.3.0" />
+	  <PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="2.3.0" />
+	  <PackageReference Include="UraniumUI.Material" Version="2.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Pages\AboutPage.xaml.cs">
 	    <DependentUpon>AboutPage.xaml</DependentUpon>
 	  </Compile>

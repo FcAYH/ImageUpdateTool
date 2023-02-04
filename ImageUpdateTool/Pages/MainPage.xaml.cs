@@ -1,105 +1,106 @@
-using System.Diagnostics;
+ï»¿using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
-using Item = ImageUpdateTool.Models.TreeView.Item;
-using Group = ImageUpdateTool.Models.TreeView.Group;
+using UraniumUI.Material.Controls;
+using Folder = ImageUpdateTool.Models.Folder;
 
 namespace ImageUpdateTool.Pages;
 
 public partial class MainPage : ContentPage
 {
-	private Models.ImageRepo _imageRepo;
+    private Models.ImageRepo _imageRepo;
 
-	public enum GitStatus
-	{
-		FailToPull, Success, FailToAdd, FailToCommit, FailToPush
-	}
-	private GitStatus _gitStatus = GitStatus.Success;
-	public GitStatus Status
-	{
-		get
-		{
-			return _gitStatus;
-		}
-		private set
-		{
-			_gitStatus = value;
-			RetryButton.IsEnabled = _gitStatus != GitStatus.Success;
-		}
-	}
-
-	private string _newFileLocalPath;
-
-    public MainPage()
-	{
-        InitializeComponent();
-		InitializeGitStatus();
-        _imageRepo = (Models.ImageRepo)BindingContext;
-
-		InitializeFolderList();
+    public enum GitStatus
+    {
+        FailToPull, Success, FailToAdd, FailToCommit, FailToPush
+    }
+    private GitStatus _gitStatus = GitStatus.Success;
+    public GitStatus Status
+    {
+        get
+        {
+            return _gitStatus;
+        }
+        private set
+        {
+            _gitStatus = value;
+            RetryButton.IsEnabled = _gitStatus != GitStatus.Success;
+        }
     }
 
-	protected override void OnAppearing()
-	{
-		base.OnAppearing();
+    private string _newFileLocalPath;
+
+    public MainPage()
+    {
+        InitializeComponent();
+        InitializeGitStatus();
+        _imageRepo = (Models.ImageRepo)BindingContext;
+
+        InitializeFolderList();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
 
         Window.Destroying += Window_Destroying;
     }
 
-	private void Window_Destroying(object sender, EventArgs e)
-	{
-		SaveGitStatus();
-	}
+    private void Window_Destroying(object sender, EventArgs e)
+    {
+        SaveGitStatus();
+    }
 
     private void InitializeFolderList()
     {
         DirectoryInfo repoDir = new DirectoryInfo(_imageRepo.LocalRepoPath);
 
-		Group rootGroup = new();
-		rootGroup.Name = "Github Repo";
+        Folder rootFolder = new();
+        GenerateFolder(rootFolder, repoDir);
 
-        GenerateGroup(rootGroup, repoDir);
-
-		FolderList.RootNodes = FolderList.ProcessGroups(rootGroup);
+        FolderTree.ItemsSource = (System.Collections.IList)rootFolder.Children;
     }
 
-	private void GenerateGroup(Group parent, DirectoryInfo directory)
-	{
-		foreach (var dir in directory.GetDirectories())
-		{
-			Group group = new();
-			group.Name = dir.Name;
-			parent.Children.Add(group);
-			GenerateGroup(group, dir);
-		}
-	}
+    private void GenerateFolder(Folder parent, DirectoryInfo directory, int layer = 0)
+    {
+        foreach (var dir in directory.GetDirectories())
+        {
+            if (dir.Name == ".git") continue;
+            Folder folder = new(dir.Name);
+            if (dir.GetDirectories().Length > 0)
+                folder.IsLeaf = false;
+            folder.ButtonWidthRequest -= layer * 10;
+            parent.Children.Add(folder);
+            GenerateFolder(folder, dir, layer + 1);
+        }
+    }
 
     private void InitializeGitStatus()
-	{
-		string localPath = FileSystem.AppDataDirectory;
-		string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
+    {
+        string localPath = FileSystem.AppDataDirectory;
+        string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
 
-		if (!File.Exists(statusSavePath))
-		{
-			File.Create(statusSavePath);
-			Status = GitStatus.Success;
-		}
-		else
-		{
-			string status = File.ReadAllText(statusSavePath);
-			try
-			{
-				Status = (GitStatus)Enum.Parse(typeof(GitStatus), status);
-			}
-			catch(Exception)
-			{
-				Status = GitStatus.Success;
-			}
-		}
-	}
+        if (!File.Exists(statusSavePath))
+        {
+            File.Create(statusSavePath);
+            Status = GitStatus.Success;
+        }
+        else
+        {
+            string status = File.ReadAllText(statusSavePath);
+            try
+            {
+                Status = (GitStatus)Enum.Parse(typeof(GitStatus), status);
+            }
+            catch(Exception)
+            {
+                Status = GitStatus.Success;
+            }
+        }
+    }
 
-	public void SaveGitStatus()
-	{
+    public void SaveGitStatus()
+    {
         string localPath = FileSystem.AppDataDirectory;
         string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
 
@@ -109,68 +110,68 @@ public partial class MainPage : ContentPage
     }
 
     private async void GitPullButton_Clicked(object sender, EventArgs e)
-	{
-		string error = _imageRepo.CallGitPull();
-		if (!string.IsNullOrEmpty(error))
-		{
-			Status = GitStatus.FailToPull;
-			await DisplayAlert("Error", $"À­È¡²Ö¿âÄÚÈİÊ§°Ü£¬´íÎóĞÅÏ¢:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
-		}
-		else
-		{
-			Status = GitStatus.Success;
-			await DisplayAlert("Success", "À­È¡Íê³É", "Yes");
-		}
-	}
+    {
+        string error = _imageRepo.CallGitPull();
+        if (!string.IsNullOrEmpty(error))
+        {
+            Status = GitStatus.FailToPull;
+            await DisplayAlert("Error", $"æ‹‰å–ä»“åº“å†…å®¹å¤±è´¥ï¼Œé”™è¯¯ä¿¡æ¯:\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
+        }
+        else
+        {
+            Status = GitStatus.Success;
+            await DisplayAlert("Success", "æ‹‰å–å®Œæˆ", "Yes");
+        }
+    }
 
-	private async void SelectImageButton_Clicked(object sender, EventArgs e)
-	{
+    private async void SelectImageButton_Clicked(object sender, EventArgs e)
+    {
         var photo = await MediaPicker.PickPhotoAsync();
 
-		if (photo != null)
-		{
-			// Move photo to _localRepoPath
-			string dateTime = DateTime.Now.ToString("yyyy/MM/dd");
-			string folderPath = Path.Combine(_imageRepo.LocalRepoPath, dateTime);
+        if (photo != null)
+        {
+            // Move photo to _localRepoPath
+            string dateTime = DateTime.Now.ToString("yyyy/MM/dd");
+            string folderPath = Path.Combine(_imageRepo.LocalRepoPath, dateTime);
 
-			if (!Directory.Exists(folderPath))
-			{
-				Directory.CreateDirectory(folderPath);
-			}
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
 
-			// Use md5 as new filename
-			string extensionName = photo.FullPath.Split('.').Last();
-			FileStream file = new(photo.FullPath, System.IO.FileMode.Open);
-			MD5 md5 = MD5.Create();
-			byte[] retVal = md5.ComputeHash(file);
-			file.Close();
-			StringBuilder sb = new();
-			for (int i = 0; i < retVal.Length; i++)
-			{
-				sb.Append(retVal[i].ToString("x2"));
-			}
-			sb.Append('.' + extensionName);
-			string newFileName = sb.ToString();
-			string newFilePath = Path.Combine(folderPath, newFileName);
+            // Use md5 as new filename
+            string extensionName = photo.FullPath.Split('.').Last();
+            FileStream file = new(photo.FullPath, System.IO.FileMode.Open);
+            MD5 md5 = MD5.Create();
+            byte[] retVal = md5.ComputeHash(file);
+            file.Close();
+            StringBuilder sb = new();
+            for (int i = 0; i < retVal.Length; i++)
+            {
+                sb.Append(retVal[i].ToString("x2"));
+            }
+            sb.Append('.' + extensionName);
+            string newFileName = sb.ToString();
+            string newFilePath = Path.Combine(folderPath, newFileName);
 
-			File.Move(photo.FullPath, newFilePath);
+            File.Move(photo.FullPath, newFilePath);
 
             // add, commit, push
             _newFileLocalPath = dateTime + "/" + newFileName;
-			
-			string error = _imageRepo.CallGitAdd(_newFileLocalPath);
-			if (!string.IsNullOrEmpty(error))
-			{
-				Status = GitStatus.FailToAdd;
-                await DisplayAlert("Error", $"ĞÂÔöÄÚÈİÊ§°Ü£¬´íÎóÔ­Òò:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
+            
+            string error = _imageRepo.CallGitAdd(_newFileLocalPath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Status = GitStatus.FailToAdd;
+                await DisplayAlert("Error", $"æ–°å¢å†…å®¹å¤±è´¥ï¼Œé”™è¯¯åŸå› :\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
                 return;
-			}
+            }
 
-			error = _imageRepo.CallGitCommit($"add new image {newFileName}");
+            error = _imageRepo.CallGitCommit($"add new image {newFileName}");
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToCommit;
-                await DisplayAlert("Error", $"Ìá½»ÄÚÈİÊ§°Ü£¬´íÎóÔ­Òò:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
+                await DisplayAlert("Error", $"æäº¤å†…å®¹å¤±è´¥ï¼Œé”™è¯¯åŸå› :\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
                 return;
             }
 
@@ -178,81 +179,104 @@ public partial class MainPage : ContentPage
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPush;
-                await DisplayAlert("Error", $"ÍÆËÍ¸üĞÂÊ§°Ü£¬´íÎóÔ­Òò:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
+                await DisplayAlert("Error", $"æ¨é€æ›´æ–°å¤±è´¥ï¼Œé”™è¯¯åŸå› :\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
                 return;
             }
 
-			await DisplayAlert("Success", "ÉÏ´«³É¹¦!", "Yes");
-			CopyURLButton.IsEnabled = true;
-			CopyURLButton.Text = $"Click to copy: {_imageRepo.LastestImageUrl}";
+            await DisplayAlert("Success", "ä¸Šä¼ æˆåŠŸ!", "Yes");
+            CopyURLButton.IsEnabled = true;
+            CopyURLButton.Text = $"Click to copy: {_imageRepo.LastestImageUrl}";
         }
     }
 
-	private async void CopyUrlButton_Clicked(object sender, EventArgs e)
-	{
-		await Clipboard.SetTextAsync(_imageRepo.LastestImageUrl);
-	}
+    private async void CopyUrlButton_Clicked(object sender, EventArgs e)
+    {
+        await Clipboard.SetTextAsync(_imageRepo.LastestImageUrl);
+    }
 
-	private async void OnRetry_Clicked(object sender, EventArgs e)
-	{
-		if (Status == GitStatus.FailToPull)
-		{
+    private async void OnRetry_Clicked(object sender, EventArgs e)
+    {
+        if (Status == GitStatus.FailToPull)
+        {
             string error = _imageRepo.CallGitPull();
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPull;
-                await DisplayAlert("Error", "À­È¡²Ö¿âÄÚÈİÊ§°Ü£¬Çë¼ì²éÍøÂçºóµã»÷Retry", "Yes");
+                await DisplayAlert("Error", "æ‹‰å–ä»“åº“å†…å®¹å¤±è´¥ï¼Œè¯·æ£€æŸ¥ç½‘ç»œåç‚¹å‡»Retry", "Yes");
             }
-			else
-			{
+            else
+            {
                 Status = GitStatus.Success;
-                await DisplayAlert("Success", "À­È¡Íê³É", "Yes");
+                await DisplayAlert("Success", "æ‹‰å–å®Œæˆ", "Yes");
             }
         }
 
-		if (Status == GitStatus.FailToAdd)
-		{
+        if (Status == GitStatus.FailToAdd)
+        {
             string error = _imageRepo.CallGitAdd(_newFileLocalPath);
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToAdd;
-                await DisplayAlert("Error", $"ĞÂÔöÄÚÈİÊ§°Ü£¬´íÎóÔ­Òò:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
+                await DisplayAlert("Error", $"æ–°å¢å†…å®¹å¤±è´¥ï¼Œé”™è¯¯åŸå› :\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
                 return;
             }
-			Status = GitStatus.FailToCommit;
+            Status = GitStatus.FailToCommit;
         }
 
-		if (Status == GitStatus.FailToCommit)
-		{
+        if (Status == GitStatus.FailToCommit)
+        {
             string error = _imageRepo.CallGitCommit($"add new image {_newFileLocalPath.Split(new char[] {'/', '\\'}).Last()}");
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToCommit;
-                await DisplayAlert("Error", $"Ìá½»ÄÚÈİÊ§°Ü£¬´íÎóÔ­Òò:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
+                await DisplayAlert("Error", $"æäº¤å†…å®¹å¤±è´¥ï¼Œé”™è¯¯åŸå› :\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
                 return;
             }
-			Status = GitStatus.FailToPush;
+            Status = GitStatus.FailToPush;
         }
 
-		if (Status == GitStatus.FailToPush)
-		{
-			string error = _imageRepo.CallGitPush();
+        if (Status == GitStatus.FailToPush)
+        {
+            string error = _imageRepo.CallGitPush();
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPush;
-                await DisplayAlert("Error", $"ÍÆËÍĞŞ¸ÄÊ§°Ü£¬´íÎóÔ­Òò:\n{error}\nÇë¼ì²éºóµã»÷Retry", "Yes");
+                await DisplayAlert("Error", $"æ¨é€ä¿®æ”¹å¤±è´¥ï¼Œé”™è¯¯åŸå› :\n{error}\nè¯·æ£€æŸ¥åç‚¹å‡»Retry", "Yes");
                 return;
             }
-			else
-			{
+            else
+            {
                 Status = GitStatus.Success;
-                await DisplayAlert("Success", "ÉÏ´«³É¹¦", "Yes");
+                await DisplayAlert("Success", "ä¸Šä¼ æˆåŠŸ", "Yes");
             }
         }
-	}
+    }
 
-	private void OnOpenRepoButton_Clicked(object sender, EventArgs e)
-	{
-		Process.Start("explorer.exe", _imageRepo.LocalRepoPath);
-	}
+    private void OnOpenRepoButton_Clicked(object sender, EventArgs e)
+    {
+        Process.Start("explorer.exe", _imageRepo.LocalRepoPath);
+    }
+
+    private void FolderButton_Cilcked(object sender, EventArgs e)
+    {
+        /*
+         * sender => Button
+         * Parent => Grid
+         * Parent.Parent => ContentView
+         * Parent.Parent.Parent => HorizontalStackLayout
+         * Parent.Parent.Parent.Parent => TreeViewNodeHolderView
+         */
+        var folder = (sender as Button).BindingContext as Folder;
+        if (!folder.IsLeaf)
+        {
+            var holder = ((sender as Button).Parent.Parent.Parent.Parent as TreeViewNodeHolderView);
+            holder.IsExpanded = !holder.IsExpanded;
+            var icon = ((sender as Button).Parent as Grid).FindByName<Label>("FolderIcon");
+            icon.Text = holder.IsExpanded ? "ğŸ“‚" : "ğŸ“";
+        }
+        else
+        {
+
+        }
+    }
 }

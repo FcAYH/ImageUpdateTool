@@ -1,7 +1,6 @@
 using ImageUpdateTool.Models;
 
-using Item = ImageUpdateTool.Models.TreeView.Item;
-using Group = ImageUpdateTool.Models.TreeView.Group;
+using System.Collections.ObjectModel;
 
 namespace ImageUpdateTool.Pages;
 
@@ -18,22 +17,31 @@ public partial class TreeViweDisplay : ContentPage
     {
         DirectoryInfo repoDir = new DirectoryInfo("C:\\Users\\F_CIL\\AppData\\Local\\Packages\\C9481A9D-76F1-41AF-90C4-B5EBB33523A6_9zz4h110yvjzm\\LocalState\\ImageUpdateTool_GitRepos\\Images");
 
-        Group rootGroup = new();
-        rootGroup.Name = "Github Repo";
+        Folder rootFolder = new();
 
-        GenerateGroup(rootGroup, repoDir);
+        GenerateFolders(rootFolder, repoDir);
 
-        FolderList.RootNodes = FolderList.ProcessGroups(rootGroup);
+        FolderList.ItemsSource = (System.Collections.IList)rootFolder.Children;
     }
 
-    private void GenerateGroup(Group parent, DirectoryInfo directory)
+    private void GenerateFolders(Folder parent, DirectoryInfo directory)
     {
         foreach (var dir in directory.GetDirectories())
         {
-            Group group = new();
-            group.Name = dir.Name;
-            parent.Children.Add(group);
-            GenerateGroup(group, dir);
+            Folder folder = new()
+            {
+                Name = dir.Name
+            };
+
+            parent.Children.Add(folder);
+            GenerateFolders(folder, dir);
         }
+    }
+
+
+    private void FolderButton_Clicked(object sender, EventArgs e)
+    {
+        string text = (sender as Button).Text;
+        DisplayAlert("Show!", text, "ok");
     }
 }

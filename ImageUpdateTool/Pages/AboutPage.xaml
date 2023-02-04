@@ -15,11 +15,14 @@
             <Label FontSize="22" FontAttributes="Bold" Text="{Binding Title}" VerticalOptions="End"/>
             <Label FontSize="22" Text="{Binding Version}" VerticalOptions="End"/>
         </HorizontalStackLayout>
-        
+
         <Label 
             Text="{Binding Message}"
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
-        <Button Text="Learn more..." Clicked="LearnMore_Clicked"/>
+        <Grid RowDefinitions="*" ColumnDefinitions="*" WidthRequest="200">
+            <Button Text="Learn more..." Clicked="LearnMore_Clicked" HorizontalOptions="Fill"/>
+        </Grid>
+        
     </VerticalStackLayout>
 </ContentPage>
