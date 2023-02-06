@@ -73,7 +73,7 @@ public partial class MainPage : ContentPage
     {
         if (_hasSelectedAFolder)
         {
-            ResizeImageDisplayGrid();
+            UpdateImageDisplayGrid();
         }
     }
 
@@ -334,31 +334,36 @@ public partial class MainPage : ContentPage
                     }
                 }
 
-                RearrangeImages();
+                UpdateImageDisplayGrid();
             }
         }
     }
 
+    private void UpdateImageDisplayGrid()
+    {
+        ResizeImageDisplayGrid();
+        RearrangeImages();
+    }
+
     private void ResizeImageDisplayGrid()
     {
-        int previousGridColumnCount = ImageDisplayGrid.ColumnDefinitions.Count;
-        int previousGridRowCount = ImageDisplayGrid.RowDefinitions.Count;
+        int currentGridColumnCount = ImageDisplayGrid.ColumnDefinitions.Count;
+        int currentGridRowCount = ImageDisplayGrid.RowDefinitions.Count;
         int gridWidth = (int)ImageDisplayGrid.Width;
-        int gridCount = previousGridColumnCount * previousGridRowCount;
+        int gridCountRequest = _imageList.Count;
 
         int newColumnCount = gridWidth / IMAGE_AREA_WIDTH;
-        int newRowCount = (int)Math.Ceiling(gridCount / (double)newColumnCount);
+        int newRowCount = (int)Math.Ceiling(gridCountRequest / (double)newColumnCount);
         
 
-        if (previousGridRowCount == newRowCount
-               && previousGridColumnCount == newColumnCount)
+        if (currentGridRowCount == newRowCount
+               && currentGridColumnCount == newColumnCount)
             return;
 
         ImageDisplayGrid.RowDefinitions = new RowDefinitionCollection(
                                                 GenerateGridRow(newRowCount));
         ImageDisplayGrid.ColumnDefinitions = new ColumnDefinitionCollection(
                                                 GenerateGridColumn(newColumnCount));
-        RearrangeImages();
     }
 
     private RowDefinition[] GenerateGridRow(int count)
@@ -384,6 +389,7 @@ public partial class MainPage : ContentPage
     private void RearrangeImages()
     {
         ImageDisplayGrid.Clear();
+
         int index = 0;
         for (int i = 0; i < ImageDisplayGrid.RowDefinitions.Count; i++)
         {

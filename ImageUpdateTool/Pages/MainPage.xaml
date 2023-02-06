@@ -63,7 +63,7 @@
 
         <ScrollView Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4">
             <Grid x:Name="ImageDisplayGrid" RowSpacing="10" ColumnSpacing="10" 
-                  Loaded="ImageDisplayGrid_Loaded">
+                  Loaded="ImageDisplayGrid_Loaded" Padding="0, 0, 0, 10">
             
             </Grid>
         </ScrollView>   
