@@ -4,6 +4,7 @@ using System.Text;
 using UraniumUI.Material.Controls;
 using Folder = ImageUpdateTool.Models.Folder;
 using ImageUpdateTool.Views;
+using ImageUpdateTool.Models;
 
 namespace ImageUpdateTool.Pages;
 
@@ -38,20 +39,6 @@ public partial class MainPage : ContentPage
 
     private Folder _currentFolder;
 
-    private bool ___selected = false; // do not use it directly
-    private bool _hasSelectedAFolder 
-    { 
-        get => ___selected;
-        set
-        {
-            ___selected= value;
-            if (!value)
-            {
-                ImageDisplayGrid.Clear();
-            }
-        }
-    }
-
     public MainPage()
     {
         InitializeComponent();
@@ -71,10 +58,7 @@ public partial class MainPage : ContentPage
 
     private void DisplayGrid_SizeChanged(object sender, EventArgs e)
     {
-        if (_hasSelectedAFolder)
-        {
-            UpdateImageDisplayGrid();
-        }
+        UpdateImageDisplayGrid();
     }
 
     protected override void OnDisappearing()
@@ -317,24 +301,33 @@ public partial class MainPage : ContentPage
         {
             if (_currentFolder != folder)
             {
-                _hasSelectedAFolder = true;
                 _currentFolder = folder;
-                _imageList.Clear();
 
-                if (Directory.Exists(folder.Path))
-                {
-                    var dir = new DirectoryInfo(folder.Path);
-                    foreach (var img in dir.GetFiles())
-                    {
-                        ImageArea area = new ImageArea();
-                        area.ImageSource = img.FullName;
-                        area.ImageSize = img.Length;
-                        area.ImageURL = _imageRepo.LocalPathToURL(img.FullName);
-                        _imageList.Add(area);
-                    }
-                }
-
+                GenerateImageList(folder.Path);
                 UpdateImageDisplayGrid();
+            }
+        }
+    }
+
+    private void GenerateImageList(string path)
+    {
+        _imageList.Clear();
+
+        if (Directory.Exists(path))
+        {
+            var dir = new DirectoryInfo(path);
+            foreach (var img in dir.GetFiles())
+            {
+                if (img.Extension == "db")
+                    continue;
+
+                ImageArea area = new ImageArea
+                {
+                    ImageSource = img.FullName,
+                    ImageSize = img.Length,
+                    ImageURL = _imageRepo.LocalPathToURL(img.FullName)
+                };
+                _imageList.Add(area);
             }
         }
     }
