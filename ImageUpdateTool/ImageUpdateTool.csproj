@@ -117,9 +117,6 @@
 	  <MauiXaml Update="Pages\MainPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Pages\TreeViweDisplay.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\ImageArea.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

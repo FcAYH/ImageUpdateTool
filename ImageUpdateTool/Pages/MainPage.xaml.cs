@@ -4,7 +4,6 @@ using System.Text;
 using UraniumUI.Material.Controls;
 using Folder = ImageUpdateTool.Models.Folder;
 using ImageUpdateTool.Views;
-using System.ComponentModel;
 
 namespace ImageUpdateTool.Pages;
 
@@ -59,7 +58,7 @@ public partial class MainPage : ContentPage
         InitializeGitStatus();
         _imageRepo = (Models.ImageRepo)BindingContext;
 
-        InitializeFolderList();
+        InitializeFolderTree();
     }
 
     protected override void OnAppearing()
@@ -89,7 +88,7 @@ public partial class MainPage : ContentPage
         SaveGitStatus();
     }
 
-    private void InitializeFolderList()
+    private void InitializeFolderTree()
     {
         DirectoryInfo repoDir = new DirectoryInfo(_imageRepo.LocalRepoPath);
 
@@ -168,6 +167,8 @@ public partial class MainPage : ContentPage
 
         if (photo != null)
         {
+            CopyURLButton.IsEnabled = false;
+
             // Move photo to _localRepoPath
             string dateTime = DateTime.Now.ToString("yyyy/MM/dd");
             string folderPath = Path.Combine(_imageRepo.LocalRepoPath, dateTime);
@@ -175,6 +176,7 @@ public partial class MainPage : ContentPage
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
+                InitializeFolderTree();
             }
 
             // Use md5 as new filename
@@ -223,7 +225,6 @@ public partial class MainPage : ContentPage
 
             await DisplayAlert("Success", "上传成功!", "Yes");
             CopyURLButton.IsEnabled = true;
-            CopyURLButton.Text = $"Click to copy: {_imageRepo.LastestImageUrl}";
         }
     }
 

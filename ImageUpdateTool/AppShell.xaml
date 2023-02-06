@@ -12,13 +12,8 @@
     </FlyoutItem>
 
     <FlyoutItem Title="About" Icon="icon_about.png">
-        <ShellContent ContentTemplate="{DataTemplate pages:AboutPage}"/>
+        <ShellContent 
+            Title="About" 
+            ContentTemplate="{DataTemplate pages:AboutPage}"/>
     </FlyoutItem>
-
-    <FlyoutItem Title="Dispaly">
-        <ShellContent
-            Title="Display"
-            ContentTemplate="{DataTemplate pages:TreeViweDisplay}"/>
-    </FlyoutItem>
-
 </Shell>
