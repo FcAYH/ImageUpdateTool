@@ -69,4 +69,9 @@ internal class ImageRepo
         LastestImageUrl = URL_PREFIX + filePath;
         return _gitProcess.Run($"add {filePath}");
     }
+
+    public string LocalPathToURL(string localPath)
+    {
+        return localPath.Replace(_localRepoPath + "\\", URL_PREFIX).Replace("\\", "/");
+    }
 }

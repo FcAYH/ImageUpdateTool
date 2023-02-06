@@ -328,7 +328,7 @@ public partial class MainPage : ContentPage
                         ImageArea area = new ImageArea();
                         area.ImageSource = img.FullName;
                         area.ImageSize = img.Length;
-                        area.ImageURL = img.FullName;
+                        area.ImageURL = _imageRepo.LocalPathToURL(img.FullName);
                         _imageList.Add(area);
                     }
                 }
