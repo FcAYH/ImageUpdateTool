@@ -3,12 +3,16 @@ using System.Security.Cryptography;
 using System.Text;
 using UraniumUI.Material.Controls;
 using Folder = ImageUpdateTool.Models.Folder;
+using ImageUpdateTool.Views;
+using System.ComponentModel;
 
 namespace ImageUpdateTool.Pages;
 
 public partial class MainPage : ContentPage
 {
     private Models.ImageRepo _imageRepo;
+
+    private List<ImageArea> _imageList = new List<ImageArea>();
 
     public enum GitStatus
     {
@@ -30,6 +34,25 @@ public partial class MainPage : ContentPage
 
     private string _newFileLocalPath;
 
+    private const int IMAGE_AREA_WIDTH = 200;
+    private const int IMAGE_AREA_HEIGHT = 150;
+
+    private Folder _currentFolder;
+
+    private bool ___selected = false; // do not use it directly
+    private bool _hasSelectedAFolder 
+    { 
+        get => ___selected;
+        set
+        {
+            ___selected= value;
+            if (!value)
+            {
+                ImageDisplayGrid.Clear();
+            }
+        }
+    }
+
     public MainPage()
     {
         InitializeComponent();
@@ -44,6 +67,21 @@ public partial class MainPage : ContentPage
         base.OnAppearing();
 
         Window.Destroying += Window_Destroying;
+        ImageDisplayGrid.SizeChanged += DisplayGrid_SizeChanged;
+    }
+
+    private void DisplayGrid_SizeChanged(object sender, EventArgs e)
+    {
+        if (_hasSelectedAFolder)
+        {
+            ResizeImageDisplayGrid();
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
     }
 
     private void Window_Destroying(object sender, EventArgs e)
@@ -66,7 +104,7 @@ public partial class MainPage : ContentPage
         foreach (var dir in directory.GetDirectories())
         {
             if (dir.Name == ".git") continue;
-            Folder folder = new(dir.Name);
+            Folder folder = new(dir.Name, dir.FullName);
             if (dir.GetDirectories().Length > 0)
                 folder.IsLeaf = false;
             folder.ButtonWidthRequest -= layer * 10;
@@ -276,7 +314,97 @@ public partial class MainPage : ContentPage
         }
         else
         {
+            if (_currentFolder != folder)
+            {
+                _hasSelectedAFolder = true;
+                _currentFolder = folder;
+                _imageList.Clear();
 
+                if (Directory.Exists(folder.Path))
+                {
+                    var dir = new DirectoryInfo(folder.Path);
+                    foreach (var img in dir.GetFiles())
+                    {
+                        ImageArea area = new ImageArea();
+                        area.ImageSource = img.FullName;
+                        area.ImageSize = img.Length;
+                        area.ImageURL = img.FullName;
+                        _imageList.Add(area);
+                    }
+                }
+
+                RearrangeImages();
+            }
         }
+    }
+
+    private void ResizeImageDisplayGrid()
+    {
+        int previousGridColumnCount = ImageDisplayGrid.ColumnDefinitions.Count;
+        int previousGridRowCount = ImageDisplayGrid.RowDefinitions.Count;
+        int gridWidth = (int)ImageDisplayGrid.Width;
+        int gridCount = previousGridColumnCount * previousGridRowCount;
+
+        int newColumnCount = gridWidth / IMAGE_AREA_WIDTH;
+        int newRowCount = (int)Math.Ceiling(gridCount / (double)newColumnCount);
+        
+
+        if (previousGridRowCount == newRowCount
+               && previousGridColumnCount == newColumnCount)
+            return;
+
+        ImageDisplayGrid.RowDefinitions = new RowDefinitionCollection(
+                                                GenerateGridRow(newRowCount));
+        ImageDisplayGrid.ColumnDefinitions = new ColumnDefinitionCollection(
+                                                GenerateGridColumn(newColumnCount));
+        RearrangeImages();
+    }
+
+    private RowDefinition[] GenerateGridRow(int count)
+    {
+        var row = new RowDefinition[count];
+        for (int i = 0; i < count; i++)
+        {
+            row[i] = new RowDefinition(IMAGE_AREA_HEIGHT);
+        }
+        return row;
+    }
+
+    private ColumnDefinition[] GenerateGridColumn(int count)
+    {
+        var column = new ColumnDefinition[count];
+        for (int i = 0; i < count; i++)
+        {
+            column[i] = new ColumnDefinition();
+        }
+        return column;
+    }
+
+    private void RearrangeImages()
+    {
+        ImageDisplayGrid.Clear();
+        int index = 0;
+        for (int i = 0; i < ImageDisplayGrid.RowDefinitions.Count; i++)
+        {
+            for (int j = 0; j < ImageDisplayGrid.ColumnDefinitions.Count; j++)
+            {
+                if (index >= _imageList.Count) 
+                    return;
+                var content = _imageList[index];
+                ImageDisplayGrid.Add(content, j, i);
+                index++;
+            }
+        }
+    }
+
+    private void ImageDisplayGrid_Loaded(object sender, EventArgs e)
+    {
+        int gridWidth = (int)ImageDisplayGrid.Width;
+        int gridHeight = (int)ImageDisplayGrid.Height;
+
+        ImageDisplayGrid.RowDefinitions = new RowDefinitionCollection(
+                                        GenerateGridRow(gridHeight / IMAGE_AREA_HEIGHT));
+        ImageDisplayGrid.ColumnDefinitions = new ColumnDefinitionCollection(
+                                                GenerateGridColumn(gridWidth / IMAGE_AREA_WIDTH));
     }
 }

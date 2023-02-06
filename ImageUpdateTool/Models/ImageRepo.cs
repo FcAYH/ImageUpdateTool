@@ -12,7 +12,7 @@ internal class ImageRepo
     public string LastestImageUrl { get; private set; }
     public string LocalRepoPath { get { return _localRepoPath; } }
 
-    private const string URL_PREFIX = "https://cdn.jsdelivr.net/gh/FcAYH/Images/";
+    public const string URL_PREFIX = "https://cdn.jsdelivr.net/gh/FcAYH/Images/";
     private const string GIT_REPO_URL = "https://github.com/FcAYH/Images.git";
     private const string USER_NAME = "FcAYH";
     private const string USER_EMAIL = "1473988037@qq.com";

@@ -11,12 +11,19 @@ internal class Folder
 
     public virtual bool IsLeaf { get; set; } = true;
 
-    public string FolderPath { get; set; }
+    public string Path { get; set; }
     public double ButtonWidthRequest { get; set; } = 200;
 
     public Folder() { }
+    
     public Folder(string name)
     {
         Name = name;
+    }
+
+    public Folder(string name, string path)
+    {
+        Name = name;
+        Path = path;
     }
 }

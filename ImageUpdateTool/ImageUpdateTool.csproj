@@ -105,8 +105,8 @@
 	  <Compile Update="Pages\AboutPage.xaml.cs">
 	    <DependentUpon>AboutPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\ResourceManageList.xaml.cs">
-	    <DependentUpon>ResourceManageList.xaml</DependentUpon>
+	  <Compile Update="Views\ImageArea.xaml.cs">
+	    <DependentUpon>ImageArea.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
@@ -120,7 +120,7 @@
 	  <MauiXaml Update="Pages\TreeViweDisplay.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\ResourceManageList.xaml">
+	  <MauiXaml Update="Views\ImageArea.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

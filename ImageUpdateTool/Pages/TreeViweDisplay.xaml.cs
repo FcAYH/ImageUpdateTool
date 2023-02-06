@@ -1,5 +1,5 @@
 using ImageUpdateTool.Models;
-
+using Microsoft.UI.Xaml;
 using System.Collections.ObjectModel;
 
 namespace ImageUpdateTool.Pages;
@@ -10,38 +10,35 @@ public partial class TreeViweDisplay : ContentPage
 	{
 		InitializeComponent();
 
-        InitializeFolderList();
+		ResizeGrid();
     }
 
-    private void InitializeFolderList()
+    protected override void OnAppearing()
     {
-        DirectoryInfo repoDir = new DirectoryInfo("C:\\Users\\F_CIL\\AppData\\Local\\Packages\\C9481A9D-76F1-41AF-90C4-B5EBB33523A6_9zz4h110yvjzm\\LocalState\\ImageUpdateTool_GitRepos\\Images");
-
-        Folder rootFolder = new();
-
-        GenerateFolders(rootFolder, repoDir);
-
-        FolderList.ItemsSource = (System.Collections.IList)rootFolder.Children;
+        base.OnAppearing();
+        DisplayAlert("Appearing", "a", "ok");
+        //Microsoft.UI.Xaml.Window.Current.SizeChanged += Page_SizeChanged;
     }
 
-    private void GenerateFolders(Folder parent, DirectoryInfo directory)
+    private void Page_SizeChanged(object sender, WindowSizeChangedEventArgs args)
     {
-        foreach (var dir in directory.GetDirectories())
-        {
-            Folder folder = new()
-            {
-                Name = dir.Name
-            };
-
-            parent.Children.Add(folder);
-            GenerateFolders(folder, dir);
-        }
+        throw new NotImplementedException();
     }
 
+    private void ResizeGrid()
+	{
+		Button button = new Button();
+		button.Text = "Clicked";
+		button.Clicked += GridButton_Clicked;
+		button.BackgroundColor = Colors.Red;
+		ImageGrid.Add(button, 0, 0);
+	}
 
-    private void FolderButton_Clicked(object sender, EventArgs e)
+    private void GridButton_Clicked(object sender, EventArgs e)
     {
-        string text = (sender as Button).Text;
-        DisplayAlert("Show!", text, "ok");
+		var rowDefine = ImageGrid.RowDefinitions;
+		rowDefine.Add(new RowDefinition());
+		var colDefine = ImageGrid.ColumnDefinitions;
+		colDefine.Add(new ColumnDefinition());
     }
 }

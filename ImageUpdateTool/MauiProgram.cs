@@ -1,4 +1,5 @@
 ﻿using ImageUpdateTool.Pages;
+using Microsoft.Maui.LifecycleEvents;
 using UraniumUI;
 
 namespace ImageUpdateTool;
