@@ -5,6 +5,7 @@ using UraniumUI.Material.Controls;
 using Folder = ImageUpdateTool.Models.Folder;
 using ImageUpdateTool.Views;
 using ImageUpdateTool.Models;
+using ImageUpdateTool.Utils;
 
 namespace ImageUpdateTool.Pages;
 
@@ -318,15 +319,21 @@ public partial class MainPage : ContentPage
             var dir = new DirectoryInfo(path);
             foreach (var img in dir.GetFiles())
             {
-                if (img.Extension == "db")
+                if (img.Extension == ".db")
                     continue;
 
-                ImageArea area = new ImageArea
+                ImageArea area = new()
                 {
-                    ImageSource = img.FullName,
                     ImageSize = img.Length,
                     ImageURL = _imageRepo.LocalPathToURL(img.FullName)
                 };
+
+                //Debug.WriteLine(Enum.IsDefined(typeof(ImageExtension), img.Extension.ToLower().Remove(0) + " " + img.Extension.Trim('.')));
+                area.ImageSource = Enum.IsDefined(typeof(ImageExtension), img.Extension.ToLower().Trim('.'))
+                                    ? img.FullName
+                                    : "error.png";    
+                 
+                
                 _imageList.Add(area);
             }
         }

@@ -1,4 +1,5 @@
 using ImageUpdateTool.Models;
+using System.Diagnostics;
 
 namespace ImageUpdateTool.Views;
 
@@ -11,6 +12,7 @@ public partial class ImageArea : ContentView
 		{
 			_imageSource = value;
 			Image.Source = value;
+			
 			ToolTipProperties.SetText(Image, value.Split('\\', '/').Last());
 		}
 	}
@@ -25,10 +27,19 @@ public partial class ImageArea : ContentView
 		}
 	}
 
-	public string ImageURL { get; set; }
+	public string ImageURL
+	{
+		get => _imageURL;
+		set
+		{
+			_imageURL = value;
+			ToolTipProperties.SetText(CopyURLButton, value);
+		}
+	}
 
 	private string _imageSource;
 	private double _imageSize;
+	private string _imageURL;
 
 	public ImageArea()
 	{

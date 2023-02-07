@@ -85,6 +85,7 @@
 	<ItemGroup>
 	  <None Remove="Resources\Images\blank.png" />
 	  <None Remove="Resources\Images\collpsedglyph.png" />
+	  <None Remove="Resources\Images\error.png" />
 	  <None Remove="Resources\Images\folder.png" />
 	  <None Remove="Resources\Images\folderclosed.png" />
 	  <None Remove="Resources\Images\folderopen.png" />

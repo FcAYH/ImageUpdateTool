@@ -22,7 +22,7 @@ internal class ImageRepo
     private string _applicationFolderPath = "";
     private string _localRepoPath = "";
 
-    private Logic.CommandRunner _gitProcess;
+    private Utils.CommandRunner _gitProcess;
 
     public ImageRepo()
     {
@@ -42,7 +42,7 @@ internal class ImageRepo
         if (!Directory.Exists(_localRepoPath))
         {
             // git clone
-            Logic.CommandRunner gitClone = new("git", _applicationFolderPath);
+            Utils.CommandRunner gitClone = new("git", _applicationFolderPath);
             result = gitClone.Run($"clone {GIT_REPO_URL}");
         }
         else

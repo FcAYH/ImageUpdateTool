@@ -8,8 +8,8 @@
         <HorizontalStackLayout Spacing="20">
             <Button x:Name="ImageSizeButton" Padding="5,0,5,0" HeightRequest="25"
                     CornerRadius="5" StyleClass="ElevatedButton"/>
-            <Button Text="Copy URL" Clicked="CopyURLButton_Clicked" Padding="5,0,5,0" HeightRequest="25"
-                    CornerRadius="5" StyleClass="OutlinedButton"/>
+            <Button x:Name="CopyURLButton" Text="Copy URL" Clicked="CopyURLButton_Clicked" Padding="5,0,5,0" HeightRequest="25"
+                    CornerRadius="5" StyleClass="OutlinedButton" />
         </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentView>
