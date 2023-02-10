@@ -1,5 +1,5 @@
-﻿using ImageUpdateTool.Pages;
-using Microsoft.Maui.LifecycleEvents;
+﻿using ImageUpdateTool.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using UraniumUI;
 
 namespace ImageUpdateTool;
@@ -13,14 +13,14 @@ public static class MauiProgram
 			.UseMauiApp<App>()
 			.UseUraniumUI()
 			.UseUraniumUIMaterial()
-            .ConfigureFonts(fonts =>
+			.ConfigureFonts(fonts =>
 			{
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                fonts.AddFontAwesomeIconFonts();
-                fonts.AddMaterialIconFonts();
-            });
+				fonts.AddFontAwesomeIconFonts();
+				fonts.AddMaterialIconFonts();
+			});
 
-        return builder.Build();
+		return builder.Build();
 	}
 }

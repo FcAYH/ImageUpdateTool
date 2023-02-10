@@ -1,6 +1,6 @@
 ﻿namespace ImageUpdateTool.Utils;
 
-enum ImageExtension
+public enum ImageExtension
 {
     png,
     jpeg,
@@ -8,4 +8,9 @@ enum ImageExtension
     tiff,
     bmp,
     jpg,
+}
+
+public enum GitStatus
+{
+    FailToPull, Success, FailToAdd, FailToCommit, FailToPush
 }

@@ -9,16 +9,38 @@ using ImageUpdateTool.Utils;
 
 namespace ImageUpdateTool.Pages;
 
+[QueryProperty(nameof(ImageRepoChanged), "ImageRepoChanged")]
 public partial class MainPage : ContentPage
 {
-    private Models.ImageRepo _imageRepo;
+    public ImageRepo CurrentImageRepo
+    {
+        get => _currentImageRepo;
+        set
+        {
+            _currentImageRepo = value;
+            InitializeFolderTree();
+        }
+    }
+
+    private ImageRepo _currentImageRepo;
+
+    private bool _imageRepoChanged;
+    public bool ImageRepoChanged
+    {
+        get => _imageRepoChanged;
+        set
+        {
+            _imageRepoChanged = value;
+            if (_imageRepoChanged)
+            {
+                CurrentImageRepo = new ImageRepo(AppShell.AppSettings.GitURL,
+                                            AppShell.AppSettings.LocalStoragePath);
+            }
+        }
+    }
 
     private List<ImageArea> _imageList = new List<ImageArea>();
-
-    public enum GitStatus
-    {
-        FailToPull, Success, FailToAdd, FailToCommit, FailToPush
-    }
+   
     private GitStatus _gitStatus = GitStatus.Success;
     public GitStatus Status
     {
@@ -33,7 +55,7 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private string _newFileLocalPath;
+    private string _newFileRelativePath;
 
     private const int IMAGE_AREA_WIDTH = 200;
     private const int IMAGE_AREA_HEIGHT = 150;
@@ -44,9 +66,9 @@ public partial class MainPage : ContentPage
     {
         InitializeComponent();
         InitializeGitStatus();
-        _imageRepo = (Models.ImageRepo)BindingContext;
 
-        InitializeFolderTree();
+        CurrentImageRepo = new ImageRepo(AppShell.AppSettings.GitURL,
+                                            AppShell.AppSettings.LocalStoragePath);
     }
 
     protected override void OnAppearing()
@@ -62,12 +84,6 @@ public partial class MainPage : ContentPage
         UpdateImageDisplayGrid();
     }
 
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-
-    }
-
     private void Window_Destroying(object sender, EventArgs e)
     {
         SaveGitStatus();
@@ -75,7 +91,7 @@ public partial class MainPage : ContentPage
 
     private void InitializeFolderTree()
     {
-        DirectoryInfo repoDir = new DirectoryInfo(_imageRepo.LocalRepoPath);
+        DirectoryInfo repoDir = new(_currentImageRepo.LocalRepoPath);
 
         Folder rootFolder = new();
         GenerateFolder(rootFolder, repoDir);
@@ -99,41 +115,25 @@ public partial class MainPage : ContentPage
 
     private void InitializeGitStatus()
     {
-        string localPath = FileSystem.AppDataDirectory;
-        string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
-
-        if (!File.Exists(statusSavePath))
+        var status = Preferences.Get(nameof(GitStatus), "Success");
+        try
         {
-            File.Create(statusSavePath);
-            Status = GitStatus.Success;
+            Status = (GitStatus)Enum.Parse(typeof(GitStatus), status);
         }
-        else
+        catch (Exception)
         {
-            string status = File.ReadAllText(statusSavePath);
-            try
-            {
-                Status = (GitStatus)Enum.Parse(typeof(GitStatus), status);
-            }
-            catch(Exception)
-            {
-                Status = GitStatus.Success;
-            }
+            Status = GitStatus.Success;
         }
     }
 
     public void SaveGitStatus()
     {
-        string localPath = FileSystem.AppDataDirectory;
-        string statusSavePath = Path.Combine(localPath, "gitStatus.txt");
-
-        if (!File.Exists(statusSavePath))
-            File.Create(statusSavePath);
-        File.WriteAllText(statusSavePath, Status.ToString());
+        Preferences.Set(nameof(GitStatus), Status.ToString());
     }
 
     private async void GitPullButton_Clicked(object sender, EventArgs e)
     {
-        string error = _imageRepo.CallGitPull();
+        string error = _currentImageRepo.CallGitPull();
         if (!string.IsNullOrEmpty(error))
         {
             Status = GitStatus.FailToPull;
@@ -156,7 +156,7 @@ public partial class MainPage : ContentPage
 
             // Move photo to _localRepoPath
             string dateTime = DateTime.Now.ToString("yyyy/MM/dd");
-            string folderPath = Path.Combine(_imageRepo.LocalRepoPath, dateTime);
+            string folderPath = Path.Combine(_currentImageRepo.LocalRepoPath, dateTime);
 
             if (!Directory.Exists(folderPath))
             {
@@ -182,9 +182,9 @@ public partial class MainPage : ContentPage
             File.Move(photo.FullPath, newFilePath);
 
             // add, commit, push
-            _newFileLocalPath = dateTime + "/" + newFileName;
+            _newFileRelativePath = dateTime + "/" + newFileName;
             
-            string error = _imageRepo.CallGitAdd(_newFileLocalPath);
+            string error = _currentImageRepo.CallGitAdd(_newFileRelativePath);
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToAdd;
@@ -192,7 +192,7 @@ public partial class MainPage : ContentPage
                 return;
             }
 
-            error = _imageRepo.CallGitCommit($"add new image {newFileName}");
+            error = _currentImageRepo.CallGitCommit($"add new image {newFileName}");
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToCommit;
@@ -200,7 +200,7 @@ public partial class MainPage : ContentPage
                 return;
             }
 
-            error = _imageRepo.CallGitPush();
+            error = _currentImageRepo.CallGitPush();
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPush;
@@ -215,14 +215,14 @@ public partial class MainPage : ContentPage
 
     private async void CopyUrlButton_Clicked(object sender, EventArgs e)
     {
-        await Clipboard.SetTextAsync(_imageRepo.LastestImageUrl);
+        await Clipboard.SetTextAsync(_currentImageRepo.LastestImageURL);
     }
 
     private async void OnRetry_Clicked(object sender, EventArgs e)
     {
         if (Status == GitStatus.FailToPull)
         {
-            string error = _imageRepo.CallGitPull();
+            string error = _currentImageRepo.CallGitPull();
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPull;
@@ -237,7 +237,7 @@ public partial class MainPage : ContentPage
 
         if (Status == GitStatus.FailToAdd)
         {
-            string error = _imageRepo.CallGitAdd(_newFileLocalPath);
+            string error = _currentImageRepo.CallGitAdd(_newFileRelativePath);
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToAdd;
@@ -249,7 +249,7 @@ public partial class MainPage : ContentPage
 
         if (Status == GitStatus.FailToCommit)
         {
-            string error = _imageRepo.CallGitCommit($"add new image {_newFileLocalPath.Split(new char[] {'/', '\\'}).Last()}");
+            string error = _currentImageRepo.CallGitCommit($"add new image {_newFileRelativePath.Split(new char[] {'/', '\\'}).Last()}");
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToCommit;
@@ -261,7 +261,7 @@ public partial class MainPage : ContentPage
 
         if (Status == GitStatus.FailToPush)
         {
-            string error = _imageRepo.CallGitPush();
+            string error = _currentImageRepo.CallGitPush();
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPush;
@@ -278,7 +278,7 @@ public partial class MainPage : ContentPage
 
     private void OnOpenRepoButton_Clicked(object sender, EventArgs e)
     {
-        Process.Start("explorer.exe", _imageRepo.LocalRepoPath);
+        Process.Start("explorer.exe", _currentImageRepo.LocalRepoPath);
     }
 
     private void FolderButton_Cilcked(object sender, EventArgs e)
@@ -325,15 +325,13 @@ public partial class MainPage : ContentPage
                 ImageArea area = new()
                 {
                     ImageSize = img.Length,
-                    ImageURL = _imageRepo.LocalPathToURL(img.FullName)
+                    ImageURL = _currentImageRepo.LocalPathToURL(img.FullName)
                 };
 
-                //Debug.WriteLine(Enum.IsDefined(typeof(ImageExtension), img.Extension.ToLower().Remove(0) + " " + img.Extension.Trim('.')));
                 area.ImageSource = Enum.IsDefined(typeof(ImageExtension), img.Extension.ToLower().Trim('.'))
                                     ? img.FullName
-                                    : "error.png";    
+                                    : "unable_to_preview.png";    
                  
-                
                 _imageList.Add(area);
             }
         }

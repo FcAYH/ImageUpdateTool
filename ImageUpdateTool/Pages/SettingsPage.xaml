@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             x:Class="ImageUpdateTool.Pages.SettingsPage"
+             Title="Settings">
+    <VerticalStackLayout Margin="20">
+
+        <Label Text="Theme" FontSize="20" FontAttributes="Bold"/>
+
+        <material:RadioButtonGroupView x:Name="AppThemeButtonGroup" Margin="10, 10"
+                                       SelectedItemChanged="AppThemeButtonGroup_SelectedItemChanged">
+            <material:RadioButton Text="Default"/>
+            <material:RadioButton Text="Light"/>
+            <material:RadioButton Text="Dark"/>
+        </material:RadioButtonGroupView>
+
+        <BoxView StyleClass="Divider"/>
+
+        <Label Text="Repositories" FontSize="20" FontAttributes="Bold"/>
+
+        <HorizontalStackLayout Margin="10, 10" Spacing="20">
+            <Label Text="Git URL : " FontSize="16" FontAttributes="Bold"/>
+            <Entry x:Name="GitURLEntry" MinimumWidthRequest="300"/>
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout Margin="10, 10" Spacing="20">
+            <Label Text="Local Diretory : " FontSize="16" FontAttributes="Bold"/>
+            <Button Text="Select" CornerRadius="5" HeightRequest="28"
+                    StyleClass="OutlinedButton"
+                    Clicked="SelectButton_Clicked"/>
+            <Entry x:Name="LocalDiretoryPreviewEntry" Text=""
+                   IsReadOnly="True" WidthRequest="400"/>
+            <Button Text="Restore the default" Clicked="RestoreTheDefaultButton_Clicked"
+                    CornerRadius="5" HeightRequest="28"
+                    StyleClass="OutlinedButton"/>
+        </HorizontalStackLayout>
+
+        <Button Text="Apply" Margin="10" WidthRequest="200" 
+                HorizontalOptions="Start"
+                CornerRadius="10" StyleClass="OutlinedButton"
+                Clicked="ApplyButton_Clicked"/>
+    </VerticalStackLayout>
+</ContentPage>

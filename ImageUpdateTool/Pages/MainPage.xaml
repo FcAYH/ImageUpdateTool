@@ -3,13 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:ImageUpdateTool.Models"
              xmlns:views="clr-namespace:ImageUpdateTool.Views"
-             xmlns:controls="clr-namespace:ImageUpdateTool.Controls"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Pages.MainPage"
              Title="Github Repo">
-    <ContentPage.BindingContext>
-        <models:ImageRepo/>
-    </ContentPage.BindingContext>
 
     <ContentPage.Resources>
         <Style TargetType="Button" Class="FunctionButton">

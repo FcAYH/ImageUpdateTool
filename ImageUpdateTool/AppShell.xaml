@@ -4,14 +4,25 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:ImageUpdateTool.Pages">
-    
-    <FlyoutItem Title="Repos" Icon="icon_notes.png">
+
+    <FlyoutItem x:Name="MainPageItem" Title="Repos" Icon="icon_notes.png" 
+                IsEnabled="false" IsVisible="False"
+                Route="MainPage">
         <ShellContent
             Title="Github"
             ContentTemplate="{DataTemplate pages:MainPage}"/>
     </FlyoutItem>
 
-    <FlyoutItem Title="About" Icon="icon_about.png">
+
+    <FlyoutItem x:Name="SettingsPageItem" Title="Settings" Icon="icon_about.png"
+                Route="SettingsPage">
+        <ShellContent 
+            Title="Settings" 
+            ContentTemplate="{DataTemplate pages:SettingsPage}"/>
+    </FlyoutItem>
+
+    <FlyoutItem x:Name="AboutPageItem" Title="About" Icon="icon_about.png"
+                Route="AboutPage">
         <ShellContent 
             Title="About" 
             ContentTemplate="{DataTemplate pages:AboutPage}"/>
