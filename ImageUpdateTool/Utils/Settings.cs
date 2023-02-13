@@ -78,6 +78,8 @@ public class Settings
             if (string.IsNullOrEmpty(_localStoragePath))
             {
                 _localStoragePath = Path.Combine(FileSystem.AppDataDirectory, DEFAULT_ROOT_FOLDER_NAME);
+                if (!Directory.Exists(_localStoragePath))
+                    Directory.CreateDirectory(_localStoragePath);
             }
 
             return _localStoragePath;
