@@ -13,10 +13,9 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="*, 40" RowSpacing="10" 
-          ColumnDefinitions="*, *, *, *, *" ColumnSpacing="10"
-          Padding="10">
-        <ScrollView Grid.Row="0" Grid.Column="0" Margin="0, 0, 5, 0">
+    <Grid RowDefinitions="*, 40, 2"  RowSpacing="5"
+          ColumnDefinitions="*, *, *, *, *" ColumnSpacing="10">
+        <ScrollView Grid.Row="0" Grid.Column="0" Margin="5, 5, 5, 5">
             <material:TreeView x:Name="FolderTree" Spacing="5" Padding="5">
                 <material:TreeView.ItemTemplate>
                     <DataTemplate>
@@ -57,22 +56,29 @@
                  
                  />
 
-        <ScrollView Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4">
+        <ScrollView Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4" Margin="5, 5, 5, 5">
             <Grid x:Name="ImageDisplayGrid" RowSpacing="10" ColumnSpacing="10" 
-                  Loaded="ImageDisplayGrid_Loaded" Padding="0, 0, 0, 10">
+                  Loaded="ImageDisplayGrid_Loaded" Padding="0, 0, 10, 5">
             
             </Grid>
         </ScrollView>   
         
         <Button Grid.Row="1" Grid.Column="0" Text="Git Pull" 
-                Clicked="GitPullButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"/>
+                Clicked="GitPullButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
+                Margin="10, 5, 5, 5"/>
         <Button Grid.Row="1" Grid.Column="1" Text="Select Image" 
-                Clicked="SelectImageButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"/>
+                Clicked="SelectImageButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
+                Margin="5, 5, 5, 5"/>
         <Button Grid.Row="1" Grid.Column="2" x:Name="CopyURLButton" Text="Copy URL" 
-                Clicked="CopyUrlButton_Clicked" IsEnabled="False" StyleClass="OutlinedButton ,FunctionButton}"/>
+                Clicked="CopyUrlButton_Clicked" IsEnabled="False" StyleClass="OutlinedButton ,FunctionButton}"
+                Margin="5, 5, 5, 5"/>
         <Button Grid.Row="1" Grid.Column="3" x:Name="RetryButton" Text="Retry" 
-                Clicked="OnRetry_Clicked" StyleClass="OutlinedButton ,FunctionButton}"/>
-        <Button Grid.Row="1" Grid.Column="4" x:Name="OpenRepoButton" Text="Open Repository Folder" 
-                Clicked="OnOpenRepoButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"/>
+                Clicked="OnRetry_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
+                Margin="5, 5, 5, 5"/>
+        <Button Grid.Row="1" Grid.Column="4" x:Name="OpenRepoButton" Text="Open Repo Folder" 
+                Clicked="OnOpenRepoButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
+                Margin="5, 5, 10, 5"/>
+
+        <ProgressBar x:Name="GitProgress" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" IsVisible="False"/>
     </Grid>
 </ContentPage>

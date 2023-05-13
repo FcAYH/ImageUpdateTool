@@ -47,7 +47,7 @@
                     Clicked="ApplyButton_Clicked"/>
         </VerticalStackLayout>
 
-        <ProgressBar x:Name="CloneProgressBar" Grid.Row="1" VerticalOptions="End" IsEnabled="False"/>
+        <ProgressBar x:Name="CloneProgressBar" Grid.Row="1" VerticalOptions="End" IsVisible="False"/>
     </Grid>
     
 </ContentPage>

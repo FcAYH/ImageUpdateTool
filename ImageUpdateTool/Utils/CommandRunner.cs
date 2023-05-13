@@ -5,13 +5,31 @@ namespace ImageUpdateTool.Utils;
 
 internal class CommandRunner
 {
+    private static List<CommandRunner> _runnerList = new List<CommandRunner>();
+
     public string ExecutablePath { get; }
     public string WorkingDirectory { get; }
+
+    private Process _process;
 
     public CommandRunner(string executablePath, string? workingDirectory = null)
     {
         ExecutablePath = executablePath ?? throw new ArgumentNullException(nameof(executablePath));
         WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(executablePath);
+    
+        _runnerList.Add(this);
+    }
+
+    public static void CloseAll()
+    {
+        foreach (var runner in _runnerList)
+        {
+            if (runner._process != null)
+            {
+                Debug.WriteLine(runner._process.Id);
+                runner._process.Kill();
+            }
+        }
     }
 
     public string Run(string arguments)
@@ -24,16 +42,16 @@ internal class CommandRunner
             UseShellExecute = false,
             WorkingDirectory = WorkingDirectory,
         };
-        var process = new Process
+        _process = new Process
         {
             StartInfo = info,
         };
-        process.Start();
-        process.WaitForExit();
-        if (process.ExitCode == 0)
+        _process.Start();
+        _process.WaitForExit();
+        if (_process.ExitCode == 0)
             return "";
                 
-        return process.StandardError.ReadToEnd();
+        return _process.StandardError.ReadToEnd();
     }
 
     public async Task<string> RunAsync(string arguments, IProgress<double> progress = null)
@@ -46,8 +64,8 @@ internal class CommandRunner
             UseShellExecute = false,
             WorkingDirectory = WorkingDirectory,
         };
-        var process = new Process { StartInfo = info, };
-        process.Start();
+        _process = new Process { StartInfo = info, };
+        _process.Start();
 
         // Read all lines of standard error asynchronously
         string line;
@@ -57,7 +75,7 @@ internal class CommandRunner
         double lastProgress = 0;
         // Create a cancellation token source with 10 seconds timeout
         var cts = new CancellationTokenSource(10000);
-        while ((line = await process.StandardError.ReadLineAsync().ConfigureAwait(false)) != null)
+        while ((line = await _process.StandardError.ReadLineAsync().ConfigureAwait(false)) != null)
         {
             Debug.WriteLine(line);
             // Extract the progress data from the line
@@ -85,15 +103,15 @@ internal class CommandRunner
                 // Add internet error to the error message
                 errorMessage += "Internet Error!\n";
                 // Kill the process
-                process.Kill();
+                _process.Kill();
                 break;
             }
         }
 
         // Wait for the process to exit asynchronously
-        await process.WaitForExitAsync().ConfigureAwait(false);
+        await _process.WaitForExitAsync().ConfigureAwait(false);
 
-        if (process.ExitCode == 0)
+        if (_process.ExitCode == 0)
             return "";
         // Return the error message
         return errorMessage;

@@ -56,9 +56,19 @@ public partial class ImageRepo
         return _gitProcess.Run("pull");
     }
 
+    public async Task<string> CallGitPullAsync(Progress<double> progress)
+    {
+        return await _gitProcess.RunAsync("pull", progress);
+    }
+
     public string CallGitPush()
     {
         return _gitProcess.Run("push");
+    }
+
+    public async Task<string> CallGitPushAsync(Progress<double> progress)
+    {
+        return await _gitProcess.RunAsync("push", progress);
     }
 
     public string CallGitCommit(string message)

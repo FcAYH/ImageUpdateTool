@@ -62,6 +62,8 @@ public partial class MainPage : ContentPage
 
     private Folder _currentFolder;
 
+    private Progress<double> _gitProgress;
+
     public MainPage()
     {
         InitializeComponent();
@@ -69,6 +71,11 @@ public partial class MainPage : ContentPage
 
         CurrentImageRepo = new ImageRepo(AppShell.AppSettings.GitURL,
                                             AppShell.AppSettings.LocalStoragePath);
+
+        _gitProgress = new(value =>
+        {
+            GitProgress.ProgressTo(value, 250, Easing.Linear);
+        });
     }
 
     protected override void OnAppearing()
@@ -133,7 +140,10 @@ public partial class MainPage : ContentPage
 
     private async void GitPullButton_Clicked(object sender, EventArgs e)
     {
-        string error = _currentImageRepo.CallGitPull();
+        GitProgress.IsVisible = true;
+        string error = await _currentImageRepo.CallGitPullAsync(_gitProgress);
+        GitProgress.IsVisible = false;
+
         if (!string.IsNullOrEmpty(error))
         {
             Status = GitStatus.FailToPull;
@@ -200,7 +210,10 @@ public partial class MainPage : ContentPage
                 return;
             }
 
-            error = _currentImageRepo.CallGitPush();
+            GitProgress.IsVisible = true;
+            error = await _currentImageRepo.CallGitPushAsync(_gitProgress);
+            GitProgress.IsVisible = false;
+
             if (!string.IsNullOrEmpty(error))
             {
                 Status = GitStatus.FailToPush;
