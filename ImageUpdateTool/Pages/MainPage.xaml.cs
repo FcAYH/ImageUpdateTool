@@ -281,7 +281,7 @@ public partial class MainPage : ContentPage
         Process.Start("explorer.exe", _currentImageRepo.LocalRepoPath);
     }
 
-    private void FolderButton_Cilcked(object sender, EventArgs e)
+    private void FolderButton_Clicked(object sender, EventArgs e)
     {
         /*
          * sender => Button

@@ -37,8 +37,8 @@
                                     StyleClass="TextButton"
                                     HeightRequest="20"
                                     WidthRequest="{Binding ButtonWidthRequest}"
-                                    CornerRadius="5"
-                                    Clicked="FolderButton_Cilcked"
+                                    CornerRadius="3"
+                                    Clicked="FolderButton_Clicked"
                                     Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                                     />
                         </Grid>

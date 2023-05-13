@@ -7,9 +7,6 @@ public partial class ImageRepo
     public string LastestImageURL { get; private set; }
     public string LocalRepoPath { get { return _localRepoPath; } }
 
-    // public const string URL_PREFIX = "https://cdn.jsdelivr.net/gh/FcAYH/Images/";
-    //private const string GIT_REPO_URL = "https://github.com/FcAYH/Images.git";
-    
     private string _localRepoPath;
     private string _rootDirectory;
     private string _gitRepoURL;

@@ -27,4 +27,11 @@
             Title="About" 
             ContentTemplate="{DataTemplate pages:AboutPage}"/>
     </FlyoutItem>
+
+    <FlyoutItem Title="TechTest" Icon="icon_about.png"
+                Route="TechTestPage">
+        <ShellContent 
+            Title="TechTest" 
+            ContentTemplate="{DataTemplate pages:TechTest}"/>
+    </FlyoutItem>
 </Shell>

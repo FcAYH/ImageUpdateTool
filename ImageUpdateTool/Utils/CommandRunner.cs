@@ -34,4 +34,8 @@ internal class CommandRunner
                 
         return process.StandardError.ReadToEnd();
     }
+
+    public async Task RunAsync(string arguments)
+    { 
+    }
 }
