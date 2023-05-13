@@ -37,6 +37,7 @@ public partial class SettingsPage : ContentPage
         string oldLocalDirectory = AppShell.AppSettings.LocalStoragePath;
         DirectoryInfo[] dirs = new DirectoryInfo(oldLocalDirectory).GetDirectories();
         
+        // 仅更换了存储路径
         if (localDirectory != oldLocalDirectory
                 && gitURL == AppShell.AppSettings.GitURL)
         {
@@ -72,9 +73,18 @@ public partial class SettingsPage : ContentPage
                 }
             }
 
+            CloneProgressBar.IsVisible = true;
+            var progress = new Progress<double>(value =>
+            {
+                Dispatcher.Dispatch(
+                    () => CloneProgressBar.ProgressTo(value, 250, Easing.Linear)
+                );
+            });
+
             CommandRunner gitClone = new("git", localDirectory);
-            var error = gitClone.Run($"clone {gitURL}");
-            
+            var error = await gitClone.RunAsync($"clone {gitURL}");
+            CloneProgressBar.IsVisible = false;
+
             if (!string.IsNullOrEmpty(error))
             {
                 await DisplayAlert("Error", $"克隆仓库失败，错误原因\n{error}\n请修复后再次点击Apply", "OK");

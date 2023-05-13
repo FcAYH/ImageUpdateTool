@@ -4,41 +4,50 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Pages.SettingsPage"
              Title="Settings">
-    <VerticalStackLayout Margin="20">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-        <Label Text="Theme" FontSize="20" FontAttributes="Bold"/>
+        <VerticalStackLayout Margin="20" Grid.Row="0">
+            <Label Text="Theme" FontSize="20" FontAttributes="Bold"/>
 
-        <material:RadioButtonGroupView x:Name="AppThemeButtonGroup" Margin="10, 10"
-                                       SelectedItemChanged="AppThemeButtonGroup_SelectedItemChanged">
-            <material:RadioButton Text="Default"/>
-            <material:RadioButton Text="Light"/>
-            <material:RadioButton Text="Dark"/>
-        </material:RadioButtonGroupView>
+            <material:RadioButtonGroupView x:Name="AppThemeButtonGroup" Margin="10, 10"
+                                           SelectedItemChanged="AppThemeButtonGroup_SelectedItemChanged">
+                <material:RadioButton Text="Default"/>
+                <material:RadioButton Text="Light"/>
+                <material:RadioButton Text="Dark"/>
+            </material:RadioButtonGroupView>
 
-        <BoxView StyleClass="Divider"/>
+            <BoxView StyleClass="Divider"/>
 
-        <Label Text="Repositories" FontSize="20" FontAttributes="Bold"/>
+            <Label Text="Repositories" FontSize="20" FontAttributes="Bold"/>
 
-        <HorizontalStackLayout Margin="10, 10" Spacing="20">
-            <Label Text="Git URL : " FontSize="16" FontAttributes="Bold"/>
-            <Entry x:Name="GitURLEntry" MinimumWidthRequest="300"/>
-        </HorizontalStackLayout>
+            <HorizontalStackLayout Margin="10, 10" Spacing="20">
+                <Label Text="Git URL : " FontSize="16" FontAttributes="Bold"/>
+                <Entry x:Name="GitURLEntry" MinimumWidthRequest="300"/>
+            </HorizontalStackLayout>
 
-        <HorizontalStackLayout Margin="10, 10" Spacing="20">
-            <Label Text="Local Diretory : " FontSize="16" FontAttributes="Bold"/>
-            <Button Text="Select" CornerRadius="5" HeightRequest="28"
-                    StyleClass="OutlinedButton"
-                    Clicked="SelectButton_Clicked"/>
-            <Entry x:Name="LocalDiretoryPreviewEntry" Text=""
-                   IsReadOnly="True" WidthRequest="400"/>
-            <Button Text="Restore the default" Clicked="RestoreTheDefaultButton_Clicked"
-                    CornerRadius="5" HeightRequest="28"
-                    StyleClass="OutlinedButton"/>
-        </HorizontalStackLayout>
+            <HorizontalStackLayout Margin="10, 10" Spacing="20">
+                <Label Text="Local Diretory : " FontSize="16" FontAttributes="Bold"/>
+                <Button Text="Select" CornerRadius="5" HeightRequest="28"
+                        StyleClass="OutlinedButton"
+                        Clicked="SelectButton_Clicked"/>
+                <Entry x:Name="LocalDiretoryPreviewEntry" Text=""
+                       IsReadOnly="True" WidthRequest="400"/>
+                <Button Text="Restore the default" Clicked="RestoreTheDefaultButton_Clicked"
+                        CornerRadius="5" HeightRequest="28"
+                        StyleClass="OutlinedButton"/>
+            </HorizontalStackLayout>
 
-        <Button Text="Apply" Margin="10" WidthRequest="200" 
-                HorizontalOptions="Start"
-                CornerRadius="10" StyleClass="OutlinedButton"
-                Clicked="ApplyButton_Clicked"/>
-    </VerticalStackLayout>
+            <Button Text="Apply" Margin="10" WidthRequest="200" 
+                    HorizontalOptions="Start"
+                    CornerRadius="10" StyleClass="OutlinedButton"
+                    Clicked="ApplyButton_Clicked"/>
+        </VerticalStackLayout>
+
+        <ProgressBar x:Name="CloneProgressBar" Grid.Row="1" VerticalOptions="End" IsEnabled="False"/>
+    </Grid>
+    
 </ContentPage>

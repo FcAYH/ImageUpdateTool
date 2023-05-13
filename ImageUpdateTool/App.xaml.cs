@@ -1,4 +1,6 @@
-﻿namespace ImageUpdateTool;
+﻿using System.Diagnostics;
+
+namespace ImageUpdateTool;
 
 public partial class App : Application
 { 
@@ -8,4 +10,11 @@ public partial class App : Application
 
 		MainPage = new AppShell();
 	}
+
+    public override void CloseWindow(Window window)
+    {
+		Debug.WriteLine("close");
+
+        base.CloseWindow(window);
+    }
 }

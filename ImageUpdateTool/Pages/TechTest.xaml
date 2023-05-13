@@ -4,17 +4,12 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Pages.TechTest"
              Title="TechTest">
-    <ScrollView Margin="0, 0, 5, 0">
-        <material:TreeView x:Name="FolderTree" Spacing="5" Padding="5" HorizontalOptions="Fill">
-            <material:TreeView.ItemTemplate>
-                <DataTemplate>
-                    <Button 
-                            Padding="10, 0"
-                            HeightRequest="25" HorizontalOptions="Fill" 
-                            CornerRadius="5"
-                            />
-                </DataTemplate>
-            </material:TreeView.ItemTemplate>
-        </material:TreeView>
-    </ScrollView>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Button x:Name="cloneButton" Grid.Row="0" Text="Click me!" Clicked="Button_Clicked"/>
+        <ProgressBar x:Name="progressBar" IsVisible="False" Grid.Row="1" VerticalOptions="End"  Progress="0.5"/>
+    </Grid>
 </ContentPage>
