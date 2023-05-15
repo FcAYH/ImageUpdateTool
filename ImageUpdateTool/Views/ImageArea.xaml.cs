@@ -5,6 +5,8 @@ namespace ImageUpdateTool.Views;
 
 public partial class ImageArea : ContentView
 {
+	public event Action<string> OnImageAreaClicked;
+
 	public string ImageSource
 	{
 		get => _imageSource;
@@ -49,5 +51,10 @@ public partial class ImageArea : ContentView
     private async void CopyURLButton_Clicked(object sender, EventArgs e)
 	{
         await Clipboard.SetTextAsync(ImageURL);
+    }
+
+    private void Image_Clicked(object sender, EventArgs e)
+    {
+		OnImageAreaClicked?.Invoke(_imageSource);
     }
 }

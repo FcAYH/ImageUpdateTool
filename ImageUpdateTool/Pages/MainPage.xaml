@@ -80,5 +80,18 @@
                 Margin="5, 5, 10, 5"/>
 
         <ProgressBar x:Name="GitProgress" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" IsVisible="False"/>
+
+        <!--用于预览图片的区域，默认隐藏-->
+        <Grid x:Name="ImagePreviewArea"
+              Grid.Row="0" Grid.RowSpan="3"
+              Grid.Column="0" Grid.ColumnSpan="5"
+              RowDefinitions="*, 30" RowSpacing="15"
+              Padding="20, 20, 20, 60" IsVisible="False">
+            <Image x:Name="PreviewImage" Grid.Row="0"/>
+            <Button Text="✖" Padding="0" Margin="0" 
+                    HeightRequest="30" WidthRequest="30"
+                    BackgroundColor="Transparent"
+                    Grid.Row="1" Clicked="ImagePreviewAreaCloseButton_Clicked"/>
+        </Grid>
     </Grid>
 </ContentPage>

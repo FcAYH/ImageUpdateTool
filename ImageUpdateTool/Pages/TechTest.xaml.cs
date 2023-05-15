@@ -27,4 +27,9 @@ public partial class TechTest : ContentPage
     {
         ImageGrid.IsVisible = false;
     }
+
+    private void ImageButton_Clicked(object sender, EventArgs e)
+    {
+        Debug.WriteLine("Image Clicked!");
+    }
 }

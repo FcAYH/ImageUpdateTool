@@ -338,16 +338,30 @@ public partial class MainPage : ContentPage
                 ImageArea area = new()
                 {
                     ImageSize = img.Length,
-                    ImageURL = _currentImageRepo.LocalPathToURL(img.FullName)
+                    ImageURL = _currentImageRepo.LocalPathToURL(img.FullName),
                 };
 
                 area.ImageSource = Enum.IsDefined(typeof(ImageExtension), img.Extension.ToLower().Trim('.'))
                                     ? img.FullName
-                                    : "unable_to_preview.png";    
-                 
+                                    : "unable_to_preview.png";
+                area.OnImageAreaClicked += OnImageClicked;
                 _imageList.Add(area);
             }
         }
+    }
+
+    private void OnImageClicked(string imgPath)
+    {
+        var bgColor = new Color(BackgroundColor.Red, BackgroundColor.Blue, BackgroundColor.Green, 0.8f);
+        ImagePreviewArea.BackgroundColor = bgColor;
+        PreviewImage.Source = imgPath;
+        ImagePreviewArea.IsVisible = true;
+    }
+
+    private void ImagePreviewAreaCloseButton_Clicked(object sender, EventArgs e)
+    {
+        PreviewImage.Source = "";
+        ImagePreviewArea.IsVisible = false;
     }
 
     private void UpdateImageDisplayGrid()
