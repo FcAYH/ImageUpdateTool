@@ -4,7 +4,7 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Pages.TechTest"
              Title="TechTest">
-    <Grid>
+    <Grid x:Name="grid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>

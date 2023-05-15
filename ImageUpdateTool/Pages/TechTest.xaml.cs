@@ -15,66 +15,36 @@ public partial class TechTest : ContentPage
         InitializeComponent();
     }
 
-    private async void Button_Clicked(object sender, EventArgs e)
+    private void Button_Clicked(object sender, EventArgs e)
     {
-        // Disable the button while cloning
-        cloneButton.IsEnabled = false;
-
-        // Reset the progress bar
-        progressBar.IsVisible = true;
-        progressBar.Progress = 0;
-
-        var progress = new Progress<double>(value =>
+        // 创建一个半透明的容器
+        var overlay = new BoxView
         {
-            this.Dispatcher.Dispatch(() =>
-            {
-                progressBar.ProgressTo(value, 250, Easing.Linear);
-            });
-        });
-        var gitRunner = new CommandRunner("git", @"C:\Users\F_CIL\Desktop\");
-        var error = await gitRunner.RunAsync("clone --progress https://github.com/FcAYH/Images.git", progress);
-        cloneButton.IsEnabled = true;
-        progressBar.IsVisible = false;
+            Color = Color.FromRgba(0, 0, 0, 0.5),
+        };
 
-        if (!string.IsNullOrEmpty(error))
+        grid.Add(overlay);
+        grid.SetRow(overlay, 0);
+        grid.SetColumn(overlay, 0);
+        grid.SetRowSpan(overlay, 2);
+
+        // 创建一个返回按钮
+        var backButton = new Button
         {
-            await DisplayAlert("Error", $"克隆仓库失败，错误原因\n{error}\n请修复后再次点击Apply", "OK");
-            return;
-        }
-    }
+            Text = "Back",
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center
+        };
 
-    private void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
-    {
-        // Do nothing with the standard output data
-    }
+        grid.Add(backButton);
+        grid.SetRow(backButton, 0);
+        grid.SetColumn(backButton, 0);
 
-    private void OnErrorDataReceived(object sender, DataReceivedEventArgs e)
-    {
-        // Parse the standard error data for progress information
-        if (e.Data != null)
+        // 为返回按钮添加点击事件处理器，移除容器和按钮
+        backButton.Clicked += (s, e) =>
         {
-            // Use a regular expression to match the progress percentage
-            var regex = new Regex(@"(\d+)%");
-            var match = regex.Match(e.Data);
-            if (match.Success)
-            {
-                // Convert the percentage to a double value
-                var percentage = double.Parse(match.Groups[1].Value) / 100;
-
-                // Update the progress bar on the UI thread
-                this.Dispatcher.Dispatch(() =>
-                {
-                    progressBar.ProgressTo(percentage, 250, Easing.Linear);
-                });
-            }
-        }
-        else
-        {
-            // The process has finished, enable the button again
-            this.Dispatcher.Dispatch(() =>
-            {
-                cloneButton.IsEnabled = true;
-            });
-        }
+            grid.Remove(overlay);
+            grid.Remove(backButton);
+        };
     }
 }
