@@ -11,5 +11,14 @@
         </Grid.RowDefinitions>
         <Button x:Name="cloneButton" Grid.Row="0" Text="Click me!" Clicked="Button_Clicked"/>
         <ProgressBar x:Name="progressBar" IsVisible="False" Grid.Row="1" VerticalOptions="End"  Progress="0.5"/>
+        <Grid x:Name="ImageGrid"
+              Grid.Row="0" Grid.RowSpan="2"
+              RowDefinitions="*, 20" RowSpacing="5"
+              Padding="20" IsVisible="False">
+            <Image Grid.Row="0" 
+                    Source="C:/Users/F_CIL/ProjectFC/GraduationProject/Assets/Images/图2-1 三种寻路建模.png"/>
+            <Button Text="❎" Padding="0" Margin="0" HeightRequest="20"
+                    WidthRequest="20" Grid.Row="1" Clicked="CloseButton_Clicked"/>
+        </Grid>
     </Grid>
 </ContentPage>
