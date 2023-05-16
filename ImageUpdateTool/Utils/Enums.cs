@@ -12,5 +12,10 @@ public enum ImageExtension
 
 public enum GitStatus
 {
-    FailToPull, Success, FailToAdd, FailToCommit, FailToPush
+    FailToPull, 
+    Success, 
+    FailToAdd, 
+    FailToCommit, 
+    FailToPush,
+    FailToRemove
 }

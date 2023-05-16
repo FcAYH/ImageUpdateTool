@@ -13,23 +13,25 @@ public partial class TechTest : ContentPage
     public TechTest()
     {
         InitializeComponent();
-        var baseColor = this.BackgroundColor;
-        Color gridColor = new Color(baseColor.Red, baseColor.Green, baseColor.Blue, 0.8f);
-        ImageGrid.BackgroundColor = gridColor;
+       
     }
 
     private void Button_Clicked(object sender, EventArgs e)
     {
-        ImageGrid.IsVisible = true;
-    }
+        Debug.WriteLine(AppShell.AppSettings.LocalStoragePath);
+        //Debug.WriteLine(FileSystem.Current.AppDataDirectory);
 
-    private void CloseButton_Clicked(object sender, EventArgs e)
-    {
-        ImageGrid.IsVisible = false;
-    }
+        //var localState = FileSystem.Current.AppDataDirectory;
 
-    private void ImageButton_Clicked(object sender, EventArgs e)
-    {
-        Debug.WriteLine("Image Clicked!");
+        //var imgFile = Path.Combine(localState, "htt.png");
+
+        //try
+        //{
+        //    File.Delete(imgFile);
+        //}
+        //catch (Exception exp)
+        //{
+        //    Debug.WriteLine(exp);
+        //}
     }
 }

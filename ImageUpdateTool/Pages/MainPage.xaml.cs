@@ -56,6 +56,7 @@ public partial class MainPage : ContentPage
     }
 
     private string _newFileRelativePath;
+    private string _removeFileRelativePath;
 
     private const int IMAGE_AREA_WIDTH = 200;
     private const int IMAGE_AREA_HEIGHT = 150;
@@ -260,6 +261,17 @@ public partial class MainPage : ContentPage
             Status = GitStatus.FailToCommit;
         }
 
+        if (Status == GitStatus.FailToRemove)
+        {
+            string error = _currentImageRepo.CallGitRemove(_removeFileRelativePath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Status = GitStatus.FailToRemove;
+                await DisplayAlert("Error", $"删除图片失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
+            }
+            Status = GitStatus.FailToCommit;
+        }
+
         if (Status == GitStatus.FailToCommit)
         {
             string error = _currentImageRepo.CallGitCommit($"add new image {_newFileRelativePath.Split(new char[] {'/', '\\'}).Last()}");
@@ -382,32 +394,53 @@ public partial class MainPage : ContentPage
         catch
         {
             var folder = Path.GetDirectoryName(imgPath);
-            var name = Path.GetFileName(imgPath);
+            var name = Path.GetFileName(imgPath); 
 
             await DisplayAlert("Error", $"因为权限问题，无法删除图片{name}，\n在您点击OK后，会自动为您打开文件资源管理器，请在其中将{name}图片删除", "OK");
             CommandRunner explorer = new("explorer");
             explorer.Run(folder);
             result = await DisplayAlert("Confirm", $"如果您已经删除了图片{name}，请点击OK，如果您不想删除它，请点击Cancel", "OK", "Cancel");
         }
-        finally
-        {
-            if (result)
-            {
-                GitProgress.IsVisible = true;
-                var error = await _currentImageRepo.CallGitPushAsync(_gitProgress);
-                GitProgress.IsVisible = false;
 
-                if (!string.IsNullOrEmpty(error))
-                {
-                    Status = GitStatus.FailToPush;
-                    await DisplayAlert("Error", $"推送更新失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
-                }
-                else
-                {
-                    //TODO：成功清理后要刷新图片的显示
-                    //      SelectImage 上传时同样忘记了，需要手动重新打开文件夹才会刷新
-                }
+        if (result)
+        {
+            // LocalStoragePath是用反斜杠 '\' 的，imgPath是用正斜杠的 '/'，emm
+            var localPath = AppShell.AppSettings.LocalStoragePath.Replace('\\', '/') + "/";
+            var relativePath = imgPath.Replace(localPath, "");
+            // 这时相对路径是：仓库名/year/month/day/image，需要去掉仓库名
+            relativePath = relativePath[(relativePath.IndexOf('/') + 1)..];
+            Debug.WriteLine(relativePath);
+
+            var error = _currentImageRepo.CallGitRemove(relativePath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                Status = GitStatus.FailToRemove;
+                await DisplayAlert("Error", $"删除图片失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
+                return;
             }
+
+            error = _currentImageRepo.CallGitCommit($"remove {relativePath}");
+            if (!string.IsNullOrEmpty(error))
+            {
+                Status = GitStatus.FailToCommit;
+                await DisplayAlert("Error", $"提交内容失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
+                return;
+            }
+
+            GitProgress.IsVisible = true;
+            error = await _currentImageRepo.CallGitPushAsync(_gitProgress);
+            GitProgress.IsVisible = false;
+
+            if (!string.IsNullOrEmpty(error))
+            {
+                Status = GitStatus.FailToPush;
+                await DisplayAlert("Error", $"推送更新失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
+                return;
+            }
+            
+            
+                //TODO：成功清理后要刷新图片的显示
+                //      SelectImage 上传时同样忘记了，需要手动重新打开文件夹才会刷新
         }
     }
 

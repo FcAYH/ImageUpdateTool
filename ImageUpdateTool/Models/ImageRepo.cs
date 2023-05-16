@@ -86,6 +86,11 @@ public partial class ImageRepo
         return _gitProcess.Run($"add {relativePath}");
     }
 
+    public string CallGitRemove(string relativePath)
+    {
+        return _gitProcess.Run($"rm {relativePath}");
+    }
+
     public string LocalPathToURL(string localPath)
     {
         string relativaPath = localPath.Replace(_localRepoPath, "");
