@@ -12,8 +12,8 @@ public partial class ImageArea : ContentView
 		get => _imageSource;
 		set
 		{
-			_imageSource = value;
-			Image.Source = value;
+			_imageSource = value.Replace('\\', '/');
+			Image.Source = _imageSource;
 			
 			ToolTipProperties.SetText(Image, value.Split('\\', '/').Last());
 		}

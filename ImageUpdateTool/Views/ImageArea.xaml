@@ -5,7 +5,7 @@
              x:Class="ImageUpdateTool.Views.ImageArea">
     <VerticalStackLayout HeightRequest="150" WidthRequest="200">
         <ImageButton x:Name="Image"  HeightRequest="120" Margin="5"
-                     Clicked="Image_Clicked" Aspect="Fill"
+                     Clicked="Image_Clicked" Aspect="AspectFit"
                      HorizontalOptions="Center" VerticalOptions="Center"/>
         <HorizontalStackLayout Spacing="20">
             <Button x:Name="ImageSizeButton" Padding="5,0,5,0" HeightRequest="25"
