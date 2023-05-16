@@ -6,6 +6,7 @@ namespace ImageUpdateTool.Views;
 public partial class ImageArea : ContentView
 {
 	public event Action<string> OnImageAreaClicked;
+	public event Action<string> OnImageDeleted;
 
 	public string ImageSource
 	{
@@ -46,7 +47,7 @@ public partial class ImageArea : ContentView
 	public ImageArea()
 	{
 		InitializeComponent();
-	}
+    }
 
     private async void CopyURLButton_Clicked(object sender, EventArgs e)
 	{
@@ -57,4 +58,9 @@ public partial class ImageArea : ContentView
     {
 		OnImageAreaClicked?.Invoke(_imageSource);
     }
+
+	private void DeleteImageButton_Clicked(Object sender, EventArgs e)
+	{
+		OnImageDeleted?.Invoke(_imageSource);
+	}
 }

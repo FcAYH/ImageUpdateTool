@@ -345,6 +345,7 @@ public partial class MainPage : ContentPage
                                     ? img.FullName
                                     : "unable_to_preview.png";
                 area.OnImageAreaClicked += OnImageClicked;
+                area.OnImageDeleted += OnImageDeleted;
                 _imageList.Add(area);
             }
         }
@@ -356,6 +357,58 @@ public partial class MainPage : ContentPage
         ImagePreviewArea.BackgroundColor = bgColor;
         PreviewImage.Source = imgPath;
         ImagePreviewArea.IsVisible = true;
+    }
+
+    private async void OnImageDeleted(string imgPath)
+    {
+        if (!await DisplayAlert("Confrim", "确认要删除该图片嘛？", "Yes", "Cancel"))
+        { 
+            return; 
+        }
+
+        if (!Path.Exists(imgPath)) // 图片已不存在，理论上不会发生
+        {
+            return;
+        }
+      
+        bool result = false;
+        try
+        {
+            File.Delete(imgPath);
+            result = true;
+
+            // TODO：如果图片是该文件夹下的最后一张，则将文件夹一并删除
+        }
+        catch
+        {
+            var folder = Path.GetDirectoryName(imgPath);
+            var name = Path.GetFileName(imgPath);
+
+            await DisplayAlert("Error", $"因为权限问题，无法删除图片{name}，\n在您点击OK后，会自动为您打开文件资源管理器，请在其中将{name}图片删除", "OK");
+            CommandRunner explorer = new("explorer");
+            explorer.Run(folder);
+            result = await DisplayAlert("Confirm", $"如果您已经删除了图片{name}，请点击OK，如果您不想删除它，请点击Cancel", "OK", "Cancel");
+        }
+        finally
+        {
+            if (result)
+            {
+                GitProgress.IsVisible = true;
+                var error = await _currentImageRepo.CallGitPushAsync(_gitProgress);
+                GitProgress.IsVisible = false;
+
+                if (!string.IsNullOrEmpty(error))
+                {
+                    Status = GitStatus.FailToPush;
+                    await DisplayAlert("Error", $"推送更新失败，错误原因:\n{error}\n请检查后点击Retry", "Yes");
+                }
+                else
+                {
+                    //TODO：成功清理后要刷新图片的显示
+                    //      SelectImage 上传时同样忘记了，需要手动重新打开文件夹才会刷新
+                }
+            }
+        }
     }
 
     private void ImagePreviewAreaCloseButton_Clicked(object sender, EventArgs e)

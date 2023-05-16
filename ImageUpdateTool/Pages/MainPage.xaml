@@ -88,10 +88,12 @@
               RowDefinitions="*, 30" RowSpacing="15"
               Padding="20, 20, 20, 60" IsVisible="False">
             <Image x:Name="PreviewImage" Grid.Row="0"/>
+
             <Button Text="✖" Padding="0" Margin="0" 
                     HeightRequest="30" WidthRequest="30"
                     BackgroundColor="Transparent"
-                    Grid.Row="1" Clicked="ImagePreviewAreaCloseButton_Clicked"/>
+                    Grid.Row="1" Clicked="ImagePreviewAreaCloseButton_Clicked"
+                    ToolTipProperties.Text="退出预览"/>
         </Grid>
     </Grid>
 </ContentPage>
