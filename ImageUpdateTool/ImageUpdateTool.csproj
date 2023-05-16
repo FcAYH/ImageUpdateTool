@@ -92,15 +92,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Images\blank.png" />
-	  <None Remove="Resources\Images\collpsedglyph.png" />
-	  <None Remove="Resources\Images\folder.png" />
-	  <None Remove="Resources\Images\folderclosed.png" />
-	  <None Remove="Resources\Images\folderopen.png" />
+	  <None Remove="Resources\Images\delete_closed.png" />
+	  <None Remove="Resources\Images\delete_open.png" />
 	  <None Remove="Resources\Images\icon_about.png" />
 	  <None Remove="Resources\Images\icon_notes.png" />
-	  <None Remove="Resources\Images\item.png" />
-	  <None Remove="Resources\Images\openglyph.png" />
 	  <None Remove="Resources\Images\unable_to_preview.png" />
 	</ItemGroup>
 
