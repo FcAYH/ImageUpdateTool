@@ -13,7 +13,6 @@
             ContentTemplate="{DataTemplate pages:MainPage}"/>
     </FlyoutItem>
 
-
     <FlyoutItem x:Name="SettingsPageItem" Title="Settings" Icon="icon_about.png"
                 Route="SettingsPage">
         <ShellContent 
@@ -33,5 +32,12 @@
         <ShellContent 
             Title="TechTest" 
             ContentTemplate="{DataTemplate pages:TechTest}"/>
+    </FlyoutItem>
+
+    <FlyoutItem x:Name="LoadingPageItem" Title="LoadingPage" Icon="icon_about.png"
+                Route="LoadingPage" IsVisible="False">
+        <ShellContent 
+            Title="Loadingpage" 
+            ContentTemplate="{DataTemplate pages:LoadingPage}"/>
     </FlyoutItem>
 </Shell>

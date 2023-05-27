@@ -19,3 +19,19 @@ public enum GitStatus
     FailToPush,
     FailToRemove
 }
+
+public enum ModelStatus
+{
+    Normal,
+    Processing,
+    FailToClone,
+    FailToUpload,
+    FailToRemove,
+    FailToSync,
+}
+
+public enum Language
+{
+    English,
+    简体中文
+}

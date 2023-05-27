@@ -12,13 +12,15 @@ internal class CommandRunner
 
     private Process _process;
 
+#nullable enable
     public CommandRunner(string executablePath, string? workingDirectory = null)
     {
         ExecutablePath = executablePath ?? throw new ArgumentNullException(nameof(executablePath));
         WorkingDirectory = workingDirectory ?? Path.GetDirectoryName(executablePath);
-    
+
         _runnerList.Add(this);
     }
+#nullable disable
 
     public static void CloseAll()
     {
