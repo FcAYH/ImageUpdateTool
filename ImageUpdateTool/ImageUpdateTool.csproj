@@ -143,6 +143,9 @@
 	  <MauiXaml Update="Views\ImageDisplayGrid.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\ProgressBar.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\RepositoryDirectoryTreeView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

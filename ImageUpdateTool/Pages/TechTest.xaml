@@ -2,14 +2,38 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:views="clr-namespace:ImageUpdateTool.Views"
              x:Class="ImageUpdateTool.Pages.TechTest"
              Title="TechTest">
-    <Grid x:Name="grid" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Button x:Name="cloneButton" Grid.Row="0" Text="Click me!" Clicked="Button_Clicked"/>
-        <ProgressBar x:Name="progressBar" IsVisible="False" Grid.Row="1" VerticalOptions="End"  Progress="0.5"/>
+    <ContentPage.Resources>
+        <Style TargetType="Border" x:Key="AreaBorder">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource OutlineVariant}, Dark={StaticResource OutlineVariantDark}}"/>
+            <Setter Property="StrokeThickness" Value="2"/>
+            <Setter Property="StrokeShape" Value="RoundRectangle 10,10,10,10"/>
+        </Style>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="*, 60">
+        <Grid ColumnDefinitions="200, *" Grid.Row="0">
+            <Border Style="{x:StaticResource AreaBorder}"
+                    Grid.Column="0">
+                <views:RepositoryDirectoryTreeView/>
+            </Border>
+            <Border Style="{x:StaticResource AreaBorder}" 
+                    Grid.Column="1">
+                <views:ImageDisplayGrid/>
+            </Border>
+        </Grid>
+
+        <views:ProgressBar x:Name="ProcessProgress" Grid.Row="1" HeightRequest="50"
+                           Margin="5, 0, 5 ,0" Progress="{x:Binding Progress}" ErrorTrigger="{x:Binding ErrorOccurred}"
+                           IsVisible="{x:Binding IsProgressBarVisible}"/>
+
+        <Border Style="{x:StaticResource AreaBorder}" 
+                Grid.Row="1">
+            <views:FunctionButtons ErrorOccurred="OnErrorOccurred"/>
+        </Border>
+        
+       
     </Grid>
 </ContentPage>

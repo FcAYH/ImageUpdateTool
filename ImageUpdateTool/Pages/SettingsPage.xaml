@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:viewModel="clr-namespace:ImageUpdateTool.ViewModels"
              x:Class="ImageUpdateTool.Pages.SettingsPage"
              Title="Settings">
     <Grid>
@@ -11,30 +12,55 @@
         </Grid.RowDefinitions>
 
         <VerticalStackLayout Margin="20" Grid.Row="0">
-            <Label Text="Theme" FontSize="20" FontAttributes="Bold"/>
+            <HorizontalStackLayout Spacing="20">
+                <VerticalStackLayout>
+                    <Label Text="Theme" FontSize="20" FontAttributes="Bold"/>
 
-            <material:RadioButtonGroupView x:Name="AppThemeButtonGroup" Margin="10, 10"
-                                           SelectedItemChanged="AppThemeButtonGroup_SelectedItemChanged">
-                <material:RadioButton Text="Default"/>
-                <material:RadioButton Text="Light"/>
-                <material:RadioButton Text="Dark"/>
-            </material:RadioButtonGroupView>
+                    <material:RadioButtonGroupView x:Name="ColorThemeButtonGroup" Margin="10, 10"
+                                                   SelectedItemChanged="ColorThemeButtonGroup_SelectedItemChanged">
+                        <material:RadioButton Text="Default"/>
+                        <material:RadioButton Text="Light"/>
+                        <material:RadioButton Text="Dark"/>
+                    </material:RadioButtonGroupView>
+                </VerticalStackLayout>
+                <VerticalStackLayout>
+                    <Label Text="Language" FontSize="20" FontAttributes="Bold"/>
 
+                    <material:RadioButtonGroupView x:Name="LanguageButtonGroup" Margin="10, 10"
+                                                   SelectedItemChanged="LanguageButtonGroup_SelectedItemChanged">
+                        <material:RadioButton Text="English"/>
+                        <material:RadioButton Text="简体中文"/>
+                    </material:RadioButtonGroupView>
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+            
             <BoxView StyleClass="Divider"/>
 
+            <Label Text="Git Settings" FontSize="20" FontAttributes="Bold"/>
+            
+            <HorizontalStackLayout Margin="10, 10" Spacing="20">
+                <Label Text="Git UserName: " FontSize="16" FontAttributes="Bold"/>
+                <Entry MinimumWidthRequest="300" Text="{x:Binding GitUserName}"/>
+            </HorizontalStackLayout>
+            
+            <HorizontalStackLayout Margin="10, 10" Spacing="20">
+                <Label Text="Git UserEmail: " FontSize="16" FontAttributes="Bold"/>
+                <Entry MinimumWidthRequest="300" Text="{x:Binding GitUserEmail}"/>
+            </HorizontalStackLayout>
+            
             <Label Text="Repositories" FontSize="20" FontAttributes="Bold"/>
 
             <HorizontalStackLayout Margin="10, 10" Spacing="20">
-                <Label Text="Git URL : " FontSize="16" FontAttributes="Bold"/>
-                <Entry x:Name="GitURLEntry" MinimumWidthRequest="300"/>
+                <Label Text="Image Repository URL: " FontSize="16" FontAttributes="Bold"/>
+                <Entry x:Name="GitURLEntry" MinimumWidthRequest="300" Text="{x:Binding ImageRepositoryURL}"/>
             </HorizontalStackLayout>
 
             <HorizontalStackLayout Margin="10, 10" Spacing="20">
-                <Label Text="Local Diretory : " FontSize="16" FontAttributes="Bold"/>
+                <Label Text="Local Diretory: " FontSize="16" FontAttributes="Bold"/>
                 <Button Text="Select" CornerRadius="5" HeightRequest="28"
                         StyleClass="OutlinedButton"
                         Clicked="SelectButton_Clicked"/>
-                <Entry x:Name="LocalDiretoryPreviewEntry" Text=""
+                <Entry x:Name="LocalDiretoryPreviewEntry" Text="{x:Binding LocalStorageLocation}"
                        IsReadOnly="True" WidthRequest="400"/>
                 <Button Text="Restore the default" Clicked="RestoreTheDefaultButton_Clicked"
                         CornerRadius="5" HeightRequest="28"
@@ -44,7 +70,8 @@
             <Button Text="Apply" Margin="10" WidthRequest="200" 
                     HorizontalOptions="Start"
                     CornerRadius="10" StyleClass="OutlinedButton"
-                    Clicked="ApplyButton_Clicked"/>
+                    Clicked="ApplyButton_Clicked"
+                    IsEnabled="{x:Binding IsApplyButtonEnabled}"/>
         </VerticalStackLayout>
 
         <ProgressBar x:Name="CloneProgressBar" Grid.Row="1" VerticalOptions="End" IsVisible="False"/>

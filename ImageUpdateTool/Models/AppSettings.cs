@@ -13,16 +13,14 @@ public class AppSettings
     private const string DEFAULT_ROOT_FOLDER_NAME = "ImageUpdateTool_GitRepos";
 
     #region Properties
+    // AppSettings实际会操作的参数就只有AppTheme和Language
+    // 剩下的参数AppSettings只负责保存和读取，具体的实现逻辑放在Image Repository Model中
     private AppTheme _colorTheme;
     private Language _language;
     private string _gitUserName;
     private string _gitUserEmail;
     private string _imageRepositoryURL;
     private string _localStorageLocation; // TODO: 类型待定
-
-    // 仅改变url、仅改变location、同时改变url和location 需要用不同的逻辑处理
-    private bool _urlChanged;
-    private bool _locationChanged;
     #endregion
 
     #region Attributes
@@ -60,8 +58,6 @@ public class AppSettings
             if (_gitUserName != value)
             {
                 _gitUserName = value;
-                // TODO: 更新git用户名
-                // 注：这里进更改本地的，而不会影响全局，所以应该在建好仓库后去修改
             }
         }
     }
@@ -74,7 +70,6 @@ public class AppSettings
             if (_gitUserEmail != value)
             {
                 _gitUserEmail = value;
-                // TODO: 更新git用户邮箱
             }
         }
     }
@@ -87,7 +82,6 @@ public class AppSettings
             if (_imageRepositoryURL != value)
             {
                 _imageRepositoryURL = value;
-                _urlChanged = true;
             }
         }
     }
@@ -100,7 +94,6 @@ public class AppSettings
             if (_localStorageLocation != value)
             {
                 _localStorageLocation = value;
-                _locationChanged = true;
             }
         }
     }
@@ -151,22 +144,12 @@ public class AppSettings
 
     public void Apply(string userName, string userEmail, string url, string location)
     {
-        _urlChanged = false;
-        _locationChanged = false;
-
         GitUserName = userName;
         GitUserEmail = userEmail;
         ImageRepositoryURL = url;
         LocalStorageLocation = location;
 
         Save();
-
-        if (_urlChanged && _locationChanged)
-            OnUrlAndLocationChanged(url, location);
-        else if (_urlChanged)
-            OnImageRepositoryURLChanged(url);
-        else if (_locationChanged)
-            OnLocalStorageLocationChanged(location);
     }
 
     public void Save()

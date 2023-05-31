@@ -1,37 +1,37 @@
-
-
 using ImageUpdateTool.Models;
 using ImageUpdateTool.Utils;
+using ImageUpdateTool.Utils.Events;
+using ImageUpdateTool.ViewModels;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using ErrorEventArgs = ImageUpdateTool.Utils.Events.ErrorEventArgs;
 
 namespace ImageUpdateTool.Pages;
 
 public partial class TechTest : ContentPage
 {
-    public TechTest()
+    private MainViewModel _mainVM;
+
+    public TechTest(MainViewModel mainVM)
     {
         InitializeComponent();
-       
+        _mainVM = mainVM;
+        BindingContext = _mainVM;
     }
 
-    private void Button_Clicked(object sender, EventArgs e)
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
-        Debug.WriteLine(AppShell.AppSettings.LocalStoragePath);
-        //Debug.WriteLine(FileSystem.Current.AppDataDirectory);
+        base.OnNavigatedTo(args);
 
-        //var localState = FileSystem.Current.AppDataDirectory;
+        // 每次导航到MainPage时，都会重新读取AppSettings
+        // 这里不使用事件机制触发是因为首次设置AppSettings后需要clone仓库
+        // 一方面clone需要构造一个ImageRepositoryModel，另一方面想要用MainPage中的进度条
+        // 展示clone的进度。
+        _mainVM.UpdateSettings();
+    }
 
-        //var imgFile = Path.Combine(localState, "htt.png");
-
-        //try
-        //{
-        //    File.Delete(imgFile);
-        //}
-        //catch (Exception exp)
-        //{
-        //    Debug.WriteLine(exp);
-        //}
+    private async void OnErrorOccurred(object sender, ErrorEventArgs e)
+    {
+        await DisplayAlert(e.Title, e.Message, "OK");
     }
 }

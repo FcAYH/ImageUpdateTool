@@ -33,8 +33,8 @@ public partial class MainPage : ContentPage
             _imageRepoChanged = value;
             if (_imageRepoChanged)
             {
-                CurrentImageRepo = new ImageRepo(AppShell.AppSettings.GitURL,
-                                            AppShell.AppSettings.LocalStoragePath);
+                CurrentImageRepo = new ImageRepo(AppShell.AppSettings1.GitURL,
+                                            AppShell.AppSettings1.LocalStoragePath);
             }
         }
     }
@@ -71,8 +71,8 @@ public partial class MainPage : ContentPage
         InitializeComponent();
         InitializeGitStatus();
 
-        CurrentImageRepo = new ImageRepo(AppShell.AppSettings.GitURL,
-                                            AppShell.AppSettings.LocalStoragePath);
+        CurrentImageRepo = new ImageRepo(AppShell.AppSettings1.GitURL,
+                                            AppShell.AppSettings1.LocalStoragePath);
 
         _gitProgress = new(value =>
         {
@@ -366,7 +366,7 @@ public partial class MainPage : ContentPage
         if (result)
         {
             // LocalStoragePath是用反斜杠 '\' 的，imgPath是用正斜杠的 '/'，emm
-            var localPath = AppShell.AppSettings.LocalStoragePath.Replace('\\', '/') + "/";
+            var localPath = AppShell.AppSettings1.LocalStoragePath.Replace('\\', '/') + "/";
             var relativePath = imgPath.Replace(localPath, "");
             // 这时相对路径是：仓库名/year/month/day/image，需要去掉仓库名
             relativePath = relativePath[(relativePath.IndexOf('/') + 1)..];

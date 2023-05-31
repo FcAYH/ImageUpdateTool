@@ -11,9 +11,11 @@ using System.Threading.Tasks;
 
 namespace ImageUpdateTool.Models
 {
-    internal partial class ImageRepositoryModel
+    public partial class ImageRepositoryModel
     {
         #region Properties
+        private readonly AppSettings _settings;
+        
         private string _repoGitURL;
         private string _localStorageLocation;
         private string _repoName;
@@ -23,12 +25,16 @@ namespace ImageUpdateTool.Models
         private string _latestRemovedImage; // TODO: 类型待定
         private ModelStatus _modelStatus;
         private string _currentSelectedDirectory; // TODO: 类型待定
+        private IProgress<double> _progress; // 用于在git操作时，汇报进度
 
         private GitStatus _gitStatus;
         private GitRunner _git;
         private string _gitUserName;
         private string _gitUserEmail;
-        
+
+        // 仅改变url、仅改变location、同时改变url和location 需要用不同的逻辑处理
+        private bool _urlChanged;
+        private bool _locationChanged;
         #endregion
 
         #region Attributes
@@ -43,11 +49,11 @@ namespace ImageUpdateTool.Models
                 if (_repoGitURL != value)
                 {
                     _repoGitURL = value;
+                    _urlChanged = true;
 
                     ExtractUserNameAndRepoName(value, out string userName, out string repoName);
                     _userName = userName;
                     RepoName = repoName;
-                    OnRepoGitURLChanged?.Invoke(_repoGitURL);
                 }
             }
         }
@@ -63,7 +69,7 @@ namespace ImageUpdateTool.Models
                 if (_localStorageLocation != value)
                 {
                     _localStorageLocation = value;
-                    OnLocalStorageLocationChanged?.Invoke(_localStorageLocation);
+                    _locationChanged = true;
                 }
             }
         }
@@ -170,6 +176,44 @@ namespace ImageUpdateTool.Models
                 }
             }
         }
+
+        public IProgress<double> Progress
+        {
+            get => _progress;
+            set
+            {
+                if (_progress != value)
+                {
+                    _progress = value;
+                }
+            }
+        }
+
+        public string GitUserName
+        {
+            get => _gitUserName;
+            set
+            {
+                if (_gitUserName != value)
+                {
+                    _gitUserName = value;
+                    // TODO: 更新git的用户名
+                }
+            }
+        }
+
+        public string GitUserEmail
+        {
+            get => _gitUserEmail;
+            set
+            {
+                if (_gitUserEmail != value)
+                {
+                    _gitUserEmail = value;
+                    // TODO: 更新git的用户邮箱
+                }
+            }
+        }
         #endregion
 
         #region Events
@@ -195,6 +239,8 @@ namespace ImageUpdateTool.Models
 
         public ImageRepositoryModel(AppSettings settings)
         {
+            _settings = settings;
+
             _repoGitURL = settings.ImageRepositoryURL;
             _localStorageLocation = settings.LocalStorageLocation;
             _gitUserName = settings.GitUserName;
@@ -219,56 +265,109 @@ namespace ImageUpdateTool.Models
             }
 
             _git = new GitRunner(_localStorageLocation);
-
-            settings.OnLocalStorageLocationChanged += OnAppSettings_LocalStorageLocationChanged;
-            settings.OnImageRepositoryURLChanged += OnAppSettings_OnImageRepositoryURLChanged;
-            settings.OnUrlAndLocationChanged += OnAppSettings_OnUrlAndLocationChanged;
         }
 
         #endregion
 
-        #region Event Handlers
-        // 仅存储位置变化，仅移动文件
-        // 仅URL变化，重新clone
-        // 两者都变化，直接在新的地方clone，并删除原文件
-
-        private void OnAppSettings_LocalStorageLocationChanged(string location)
+        /// <summary>
+        /// 仅存储位置变化，仅移动文件
+        /// </summary>
+        /// <param name="lastLocation">原存储位置</param>
+        private void LocalStorageLocationChanged(string lastLocation)
         {
             // 当本地存储位置发生变化时，需要做三件事情
             // 1. 将原位置的数据转移到新位置
             // 2. 更新_git的工作目录（应该要重新设置userName和email）
             // 3. 将事件传出去，通知ViewModels更新
 
+            var lastPath = Path.Combine(lastLocation, _repoName);
             var currentPath = Path.Combine(_localStorageLocation, _repoName);
-            var newPath = Path.Combine(location, _repoName);
 
             // 1. 将原位置的数据转移到新位置
-            DirectoryTools.MoveDirectory(currentPath, newPath);
-            _localStorageLocation = location;
-            _git.WorkingDirectory = newPath;
+            try
+            {
+                DirectoryTools.MoveDirectory(lastPath, currentPath);
+            }
+            catch { } // 无所谓，最后要自检，如果移动不成功会直接在新位置clone
+            finally
+            {
+                // 2. 更新_git的工作目录
+                _git.WorkingDirectory = currentPath; // TODO：应该要重新设置userName和email
 
-            // TODO：应该要重新设置userName和email
-            OnLocalStorageLocationChanged?.Invoke(_localStorageLocation);
+                // TODO：移除这个事件，更换为自检通过后开启
+                OnLocalStorageLocationChanged?.Invoke(_localStorageLocation);
+            }
         }
 
-        private async void OnAppSettings_OnImageRepositoryURLChanged(string url)
+        /// <summary>
+        /// 仅URL变化，重新clone
+        /// </summary>
+        /// <param name="lastUrl">原url</param>
+        private async void ImageRepositoryURLChanged(string lastUrl)
         {
             // 当图床仓库的URL发生变化时，需要做两件事情
             // 1. 重新clone仓库
             // 2. 重新生成_userName和_repoName
             // 3. 将事件传出去，通知ViewModels更新
             // 4. 删除原仓库
-            await CloneRepositoryAsync();
+            //await CloneRepositoryAsync();
             _repoGitURL = url;
         }
 
-        private void OnAppSettings_OnUrlAndLocationChanged(string arg1, string arg2)
+        /// <summary>
+        /// url和location都变化，直接在新的地方clone，并删除原文件
+        /// </summary>
+        /// <param name="lastUrl">原url</param>
+        /// <param name="lastLocation">原location</param>
+        private void UrlAndLocationChanged(string lastUrl, string lastLocation)
         {
             throw new NotImplementedException();
         }
-        #endregion
 
-        #region Methods
+        public async Task<string> Initilize()
+        {
+            _urlChanged = false;
+            _locationChanged = false;
+
+            GitUserName = _settings.GitUserName;
+            GitUserEmail = _settings.GitUserEmail;
+            var lastUrl = RepoGitURL;
+            RepoGitURL = _settings.ImageRepositoryURL;
+            var lastLocation = LocalStorageLocation;
+            LocalStorageLocation = _settings.LocalStorageLocation;
+
+            // url和location都发生变化，直接在新位置clone，并移除旧位置的内容
+            if (_urlChanged && _locationChanged)
+                UrlAndLocationChanged(lastUrl, lastLocation);
+            // 仅url发生变化，
+            else if (_urlChanged)
+                ImageRepositoryURLChanged(lastUrl);
+            else if (_locationChanged)
+                LocalStorageLocationChanged(lastLocation);
+
+            return await SelfCheck().ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 自检，验证当前LocalStorageLocation下有没有Repo，
+        /// 没有的话要重新clone
+        /// </summary>
+        private async Task<string> SelfCheck()
+        {
+            if (!Directory.Exists(LocalStorageLocation))
+            {
+                Directory.CreateDirectory(LocalStorageLocation);
+            }
+
+            if (!Directory.Exists(Path.Combine(LocalStorageLocation, RepoName)))
+            {
+                return await CloneRepositoryAsync().ConfigureAwait(false);
+            }
+
+            return string.Empty;
+        }
+
+        #region Git-Methods
         /// <summary>
         /// 异步方法，用于上传图片
         /// <para>当ModelStatus不为Normal时，无法调用此方法</para>
@@ -277,7 +376,7 @@ namespace ImageUpdateTool.Models
         /// <param name="progress">用于报告进度</param>
         /// <returns><see cref="string"/>类型, 若上传成功则内容为空，否则内容为错误信息</returns>
         /// <exception cref="ModelProcessingUnderErrorStatus"/>
-        public async Task<string> UploadImageAsync(string path, IProgress<double> progress = null)
+        public async Task<string> UploadImageAsync(string path)
         {
             if (ModelStatus != ModelStatus.Normal)
             {
@@ -304,7 +403,7 @@ namespace ImageUpdateTool.Models
                 return error;
             }
 
-            error = await _git.PushAsync(progress).ConfigureAwait(false);
+            error = await _git.PushAsync(Progress).ConfigureAwait(false);
             if (!string.IsNullOrEmpty (error))
             {
                 ModelStatus = ModelStatus.FailToUpload;
@@ -324,7 +423,7 @@ namespace ImageUpdateTool.Models
         /// <param name="progress">用于报告进度</param>
         /// <returns><see cref="string"/>类型，若移除成功则内容为空，否则内容为错误信息</returns>
         /// <exception cref="ModelProcessingUnderErrorStatus"/>
-        public async Task<string> RemoveImageAsync(string path, IProgress<double> progress)
+        public async Task<string> RemoveImageAsync(string path)
         {
             if (ModelStatus != ModelStatus.Normal)
             {
@@ -352,7 +451,7 @@ namespace ImageUpdateTool.Models
                 return error;
             }
 
-            error = await _git.PushAsync(progress).ConfigureAwait(false);
+            error = await _git.PushAsync(Progress).ConfigureAwait(false);
             if (string.IsNullOrEmpty(error))
             {
                 ModelStatus = ModelStatus.FailToRemove;
@@ -374,7 +473,7 @@ namespace ImageUpdateTool.Models
         /// <param name="needPush">默认为false，仅拉取，若传入值为true，则会在拉取后推送</param>
         /// <returns><see cref="string"/>类型，若同步成功则内容为空，否则内容为错误信息</returns>
         /// <exception cref="ModelProcessingUnderErrorStatus"/>
-        public async Task<string> SyncWithRemoteAsync(IProgress<double> progress, bool needPush = false)
+        public async Task<string> SyncWithRemoteAsync(bool needPush = false)
         {
             if (ModelStatus != ModelStatus.Normal)
             {
@@ -384,7 +483,7 @@ namespace ImageUpdateTool.Models
             ModelStatus = ModelStatus.Processing;
 
             // 同步的步骤，Pull -> Push(if needPush == true)
-            var error = await _git.PullAsync(progress).ConfigureAwait(false);
+            var error = await _git.PullAsync(Progress).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(error))
             {
                 ModelStatus = ModelStatus.FailToSync;
@@ -394,7 +493,7 @@ namespace ImageUpdateTool.Models
 
             if (needPush)
             {
-                error = await _git.PushAsync(progress).ConfigureAwait(false);
+                error = await _git.PushAsync(Progress).ConfigureAwait(false);
                 if (!string.IsNullOrEmpty(error))
                 {
                     ModelStatus = ModelStatus.FailToSync;
@@ -412,7 +511,7 @@ namespace ImageUpdateTool.Models
         /// 异步方法，用于重试之前失败的操作。
         /// </summary>
         /// <returns><see cref="string"/>类型，若重试成功则内容为空，否则内容为错误信息</returns>
-        public async Task<string> RetryAsync(IProgress<double> progress)
+        public async Task<string> RetryAsync()
         {
             ModelStatus = ModelStatus.Processing;
 
@@ -448,7 +547,7 @@ namespace ImageUpdateTool.Models
 
                 if (_gitStatus == GitStatus.FailToPush)
                 {
-                    var error = await _git.PushAsync(progress).ConfigureAwait(false);
+                    var error = await _git.PushAsync(Progress).ConfigureAwait(false);
                     if (!string.IsNullOrEmpty(error))
                     {
                         _gitStatus = GitStatus.FailToPush;
@@ -482,7 +581,7 @@ namespace ImageUpdateTool.Models
 
                 if (_gitStatus == GitStatus.FailToPush)
                 {
-                    var error = await _git.PushAsync(progress).ConfigureAwait(false);
+                    var error = await _git.PushAsync(Progress).ConfigureAwait(false);
                     if (!string.IsNullOrEmpty(error))
                     {
                         _gitStatus = GitStatus.FailToPush;
@@ -494,7 +593,7 @@ namespace ImageUpdateTool.Models
             {
                 if (_gitStatus == GitStatus.FailToPull)
                 {
-                    var error = await _git.PullAsync(progress).ConfigureAwait(false);
+                    var error = await _git.PullAsync(Progress).ConfigureAwait(false);
                     if (!string.IsNullOrEmpty(error))
                     {
                         _gitStatus = GitStatus.FailToPull;
@@ -505,7 +604,7 @@ namespace ImageUpdateTool.Models
 
                 if (_gitStatus == GitStatus.FailToPush)
                 {
-                    var error = await _git.PushAsync(progress).ConfigureAwait(false);
+                    var error = await _git.PushAsync(Progress).ConfigureAwait(false);
                     if (!string.IsNullOrEmpty(error))
                     {
                         _gitStatus = GitStatus.FailToPush;
@@ -520,13 +619,13 @@ namespace ImageUpdateTool.Models
             return string.Empty;
         }
 
-        public async Task<string> CloneRepositoryAsync(IProgress<double> progress)
+        public async Task<string> CloneRepositoryAsync()
         {
             // 注意clone时，git的工作目录与其他操作不同的
             _git.WorkingDirectory = LocalStorageLocation;
 
             ModelStatus = ModelStatus.Processing;
-            var error = await _git.CloneAsync(RepoGitURL, progress).ConfigureAwait(false);
+            var error = await _git.CloneAsync(RepoGitURL, Progress).ConfigureAwait(false);
             if (!string.IsNullOrEmpty(error))
             {
                 ModelStatus = ModelStatus.FailToClone;

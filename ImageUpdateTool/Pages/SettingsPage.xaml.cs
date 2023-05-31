@@ -1,112 +1,81 @@
+using ImageUpdateTool.ViewModels;
 using ImageUpdateTool.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace ImageUpdateTool.Pages;
 
 public partial class SettingsPage : ContentPage
 {
-	public SettingsPage()
+    private SettingsViewModel _settingsVM;
+    private readonly EmailAddressAttribute _emailValidator = new();
+    public SettingsPage(SettingsViewModel settingsVM)
 	{
+        _settingsVM = settingsVM;
+        BindingContext = _settingsVM;
+
 		InitializeComponent();
         InitializeContent();
 	}
 
     private void InitializeContent()
     {
-        AppThemeButtonGroup.SelectedIndex = ((int)AppShell.AppSettings.CurrentTheme);
-        GitURLEntry.Text = AppShell.AppSettings.GitURL;
-        LocalDiretoryPreviewEntry.Text = AppShell.AppSettings.LocalStoragePath;
+        ColorThemeButtonGroup.SelectedIndex = (int)_settingsVM.ColorTheme;
+        LanguageButtonGroup.SelectedIndex = (int)_settingsVM.Language;
     }
 
     private async void SelectButton_Clicked(object sender, EventArgs e)
     {
         string path = await FolderPicker.PickSingleFolderAsync();
-        LocalDiretoryPreviewEntry.Text = path;
+        _settingsVM.LocalStorageLocation = path;
     }
 
     private async void ApplyButton_Clicked(object sender, EventArgs e)
     {
-        // 检测Git URL的合法性
-        string gitURL = GitURLEntry.Text;
-        if (!(gitURL.StartsWith("https") && gitURL.EndsWith(".git")))
+        _settingsVM.IsApplyButtonEnabled = false;
+        // 点击ApplyButton后，判定各个参数是否合法；
+        // 若不合法，则弹出警告框，不做任何修改；
+        // 若合法，保存修改。
+
+        // 邮箱和用户名可以留空，但是填写的话，邮箱要符合正确的格式
+        string userEmail = _settingsVM.GitUserEmail;
+        if (!string.IsNullOrEmpty(userEmail) && !_emailValidator.IsValid(userEmail))
         {
-            await DisplayAlert("Error", "Invaild \"Git URL\"", "OK");
+            await DisplayAlert("Error", "Invaild Email Address!", "OK");
             return;
         }
 
-        string localDirectory = LocalDiretoryPreviewEntry.Text;
-        string oldLocalDirectory = AppShell.AppSettings.LocalStoragePath;
-        DirectoryInfo[] dirs = new DirectoryInfo(oldLocalDirectory).GetDirectories();
-        
-        // 仅更换了存储路径
-        if (localDirectory != oldLocalDirectory
-                && gitURL == AppShell.AppSettings.GitURL)
+        string url = _settingsVM.ImageRepositoryURL;
+        if (!(url.StartsWith("https") && url.EndsWith(".git")))
         {
-            string[] dirName = dirs.Select(d => d.Name).ToArray();
-            if (dirName.Length > 0)
-            {
-                foreach (string name in dirName)
-                {
-                    Directory.Move(Path.Combine(oldLocalDirectory, name),
-                                    Path.Combine(localDirectory, name));
-                }
-            }
+            await DisplayAlert("Error", "Invaild \"Image Repository URL\"!", "OK");
+            return;
         }
 
-        if (gitURL != AppShell.AppSettings.GitURL)
+        string path = _settingsVM.LocalStorageLocation;
+        if (!Directory.Exists(path))
         {
-            string[] dirName = dirs.Select(d => d.FullName).ToArray();
-            if (dirName.Length > 0)
-            {
-                foreach (string name in dirName)
-                {
-                    try
-                    {
-                        Directory.Delete(name, true);
-                    }
-                    catch 
-                    {
-                        await DisplayAlert("Error", $"因为权限问题，无法删除文件夹{name}，这可能会影响后续的操作\n在您点击OK后，会自动为您打开文件资源管理器，请在其中将{name}文件夹删除", "OK");
-                        CommandRunner explorer = new("explorer");
-                        explorer.Run(oldLocalDirectory);
-                        await DisplayAlert("Confirm", $"请在删除{name}文件夹后点击\"OK\"", "OK");
-                    }
-                }
-            }
-
-            CloneProgressBar.IsVisible = true;
-            var progress = new Progress<double>(value =>
-            {
-                Dispatcher.Dispatch(
-                    () => CloneProgressBar.ProgressTo(value, 250, Easing.Linear)
-                );
-            });
-
-            CommandRunner gitClone = new("git", localDirectory);
-            var error = await gitClone.RunAsync($"clone {gitURL}");
-            CloneProgressBar.IsVisible = false;
-
-            if (!string.IsNullOrEmpty(error))
-            {
-                await DisplayAlert("Error", $"克隆仓库失败，错误原因\n{error}\n请修复后再次点击Apply", "OK");
-                return;
-            }
+            await DisplayAlert("Error", "Invaild \"Local Storage Location\"!\nThis Directory is not exist!", "OK");
+            return;
         }
 
-        AppShell.AppSettings.GitURL = gitURL;
-        AppShell.AppSettings.LocalStoragePath = localDirectory;
-        
-        (Shell.Current as AppShell).UnlockMainPage();
-        await Shell.Current.GoToAsync("//MainPage?ImageRepoChanged=true");
+        // 保存修改
+        _settingsVM.ApplyChanges();
+
+        _settingsVM.IsApplyButtonEnabled = true;
     }
 
-    private void AppThemeButtonGroup_SelectedItemChanged(object sender, EventArgs e)
+    private void ColorThemeButtonGroup_SelectedItemChanged(object sender, EventArgs e)
     {
-        AppShell.AppSettings.CurrentTheme = (AppTheme)(AppThemeButtonGroup.SelectedIndex);
+        _settingsVM.ColorTheme = (AppTheme)(ColorThemeButtonGroup.SelectedIndex);
+    }
+
+    private void LanguageButtonGroup_SelectedItemChanged(object sender, EventArgs e)
+    {
+        _settingsVM.Language = (Language)(LanguageButtonGroup.SelectedIndex);
     }
 
     private void RestoreTheDefaultButton_Clicked(object sender, EventArgs e)
     {
-        AppShell.AppSettings.SetLocalStoragePathToDefault();
-        InitializeContent();
+        _settingsVM.SetLocalStorageLocationToDefault();
     }
 }
