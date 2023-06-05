@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImageUpdateTool.Utils.Tools
 {
+    // Write by Copliot 看上去挺蠢的，明明C#都提供了对应的方法，非要自己写一遍
     internal static class DirectoryTools
     {
         public static void MoveDirectory(string sourcePath, string destPath)
@@ -48,6 +49,30 @@ namespace ImageUpdateTool.Utils.Tools
 
             // 删除源文件夹（如果为空）
             Directory.Delete(sourcePath, true);
+        }
+    
+        public static void DeleteDirectory(string dirPath)
+        {
+            // 检查文件夹是否存在，如果不存在，抛出异常
+            if (!Directory.Exists(dirPath))
+            {
+                throw new DirectoryNotFoundException($"Directory does not exist: {dirPath}");
+            }
+
+            // 获取文件夹下的所有文件的路径，并遍历它们
+            string[] files = Directory.GetFiles(dirPath);
+            foreach (string file in files)
+            {
+                // 删除文件
+                File.Delete(file);
+            }
+
+            // 获取文件夹下的所有子文件夹的路径，并遍历它们
+            string[] subDirs = Directory.GetDirectories(dirPath);
+            foreach (string subDir in subDirs)
+            {
+                DeleteDirectory(subDir);
+            }
         }
     }
 }

@@ -27,6 +27,7 @@ public partial class AppShell : Shell
 
     public void UnlockMainPage()
 	{
+		FlyoutBehavior = FlyoutBehavior.Flyout;
         MainPageItem.IsEnabled = true;
         MainPageItem.IsVisible = true;
     }

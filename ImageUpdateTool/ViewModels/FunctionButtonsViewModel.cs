@@ -1,11 +1,16 @@
 ﻿using ImageUpdateTool.Models;
+using ImageUpdateTool.Utils;
+using ImageUpdateTool.Utils.Events;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ErrorEventArgs = ImageUpdateTool.Utils.Events.ErrorEventArgs;
 
 namespace ImageUpdateTool.ViewModels
 {
@@ -14,15 +19,15 @@ namespace ImageUpdateTool.ViewModels
         private ImageRepositoryModel _model;
 
         #region Properties
-        private bool _isSyncRemoteButtonEnabled;
-        private bool _isSelectImageButtonEnabled;
-        private bool _isCopyUrlButtonEnabled;
-        private bool _isRetryButtonEnabled;
-        private bool _isOpenLocalDirectoryButtonEnabled;
-        private string _copyUrlButtonTooltip;
+        private bool _isSyncRemoteButtonEnabled = true;
+        private bool _isUploadImageButtonEnabled = true;
+        private bool _isCopyUrlButtonEnabled = false;
+        private bool _isRetryButtonEnabled = false;
+        private bool _isOpenLocalDirectoryButtonEnabled = true;
+        private string _copyUrlButtonTooltip = string.Empty;
 
         private Command _syncRemoteCommand;
-        private Command _selectImageCommand;
+        private Command _uploadImageCommand;
         private Command _copyUrlCommand;
         private Command _retryCommand;
         private Command _openLocalDirectoryCommand;
@@ -42,15 +47,15 @@ namespace ImageUpdateTool.ViewModels
             }
         }
         
-        public bool IsSelectImageButtonEnabled
+        public bool IsUploadImageButtonEnabled
         {
-            get => _isSelectImageButtonEnabled;
+            get => _isUploadImageButtonEnabled;
             set
             {
-                if (_isSelectImageButtonEnabled != value)
+                if (_isUploadImageButtonEnabled != value)
                 {
-                    _isSelectImageButtonEnabled = value;
-                    OnPropertyChanged(nameof(IsSelectImageButtonEnabled));
+                    _isUploadImageButtonEnabled = value;
+                    OnPropertyChanged(nameof(IsUploadImageButtonEnabled));
                 }
             }
         }
@@ -116,12 +121,12 @@ namespace ImageUpdateTool.ViewModels
             }
         }
 
-        public Command SelectImageButtonCommand
+        public Command UploadImageButtonCommand
         {
             get
             {
-                _selectImageCommand ??= new Command(SelectImageButtonCommandExecute);
-                return _selectImageCommand;
+                _uploadImageCommand ??= new Command(UploadImageButtonCommandExecute);
+                return _uploadImageCommand;
             }
         }
 
@@ -153,6 +158,8 @@ namespace ImageUpdateTool.ViewModels
         }
         #endregion
 
+        public event Action<ErrorEventArgs> OnErrorOccurred;
+
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
@@ -161,37 +168,113 @@ namespace ImageUpdateTool.ViewModels
         }
         #endregion
 
+        public FunctionButtonsViewModel() { }
         public FunctionButtonsViewModel(ImageRepositoryModel model) 
         { 
             _model = model;
+            _model.OnModelStatusChanged += ImageRepositoryModel_OnModelStatusChanged;
+            _model.OnImageUploaded += ImageRepositoryModel_OnImageUploaded;
         }
 
         #region Command Methods
-        private void SyncRemoteButtonCommandExecute()
+        private async void SyncRemoteButtonCommandExecute()
         {
-            throw new NotImplementedException();
+            var error = await _model.SyncWithRemoteAsync();
+            if (!string.IsNullOrEmpty(error)) 
+            {
+                OnErrorOccurred?.Invoke(new ErrorEventArgs(error, "SyncRemote"));
+            }
         }
 
-        private void SelectImageButtonCommandExecute()
+        private async void UploadImageButtonCommandExecute()
         {
-            throw new NotImplementedException();
+            var photo = await MediaPicker.PickPhotoAsync();
+            if (photo == null) return;
+
+            string dateTime = DateTime.Now.ToString("yyyy/MM/dd");
+            string folderPath = Path.Combine(_model.LocalStorageLocation, _model.RepoName, dateTime);
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // 使用md5作为文件名
+            string extensionName = Path.GetExtension(photo.FileName);
+            FileStream file = new(photo.FullPath, System.IO.FileMode.Open);
+            MD5 md5 = MD5.Create();
+            byte[] retVal = md5.ComputeHash(file);
+            file.Close();
+            StringBuilder sb = new();
+            for (int i = 0; i < retVal.Length; i++)
+            {
+                sb.Append(retVal[i].ToString("x2"));
+            }
+            sb.Append(extensionName);
+            string newFileName = sb.ToString();
+            string newFilePath = Path.Combine(folderPath, newFileName);
+            File.Move(photo.FullPath, newFilePath);
+
+            var relativePath = $"{dateTime}/{newFileName}";
+
+            var error = await _model.UploadImageAsync(relativePath);
+            if (!string.IsNullOrEmpty(error))
+            {
+                OnErrorOccurred?.Invoke(new ErrorEventArgs(error, "UploadImage"));
+            }
         }
 
-        private void CopyUrlButtonCommandExecute()
+        private async void CopyUrlButtonCommandExecute()
         {
-            throw new NotImplementedException();
+            await Clipboard.SetTextAsync(_model.LatestUploadedImageUrl);
         }
         
-        private void RetryButtonCommandExecute()
+        private async void RetryButtonCommandExecute()
         {
-            throw new NotImplementedException();
+            var error = await _model.RetryAsync();
+            if (!string.IsNullOrEmpty(error))
+            {
+                OnErrorOccurred?.Invoke(new ErrorEventArgs(error, "Retry"));
+            }
         }
         
         private void OpenLocalDirectoryButtonCommandExecute()
         {
-            throw new NotImplementedException();
+            Process.Start("explorer.exe", _model.LocalStorageLocation);
         }
 
         #endregion
+
+        private void ImageRepositoryModel_OnModelStatusChanged(ModelStatus status)
+        {
+            if (status == ModelStatus.Processing)
+            {
+                IsSyncRemoteButtonEnabled = false;
+                IsUploadImageButtonEnabled = false;
+                IsRetryButtonEnabled = false;
+            }
+            else if (status == ModelStatus.Normal)
+            {
+                IsSyncRemoteButtonEnabled = true;
+                IsUploadImageButtonEnabled = true;
+                IsRetryButtonEnabled = false;
+            }
+            else
+            {
+                IsSyncRemoteButtonEnabled = false;
+                IsUploadImageButtonEnabled = false;
+                IsRetryButtonEnabled = true;
+            }
+
+            if (!string.IsNullOrEmpty(_model.LatestUploadedImage))
+            {
+                IsCopyUrlButtonEnabled = true;
+            }
+        }
+
+        private void ImageRepositoryModel_OnImageUploaded(string obj)
+        {
+            CopyUrlButtonTooltip = _model.LatestUploadedImageUrl;
+        }
     }
 }

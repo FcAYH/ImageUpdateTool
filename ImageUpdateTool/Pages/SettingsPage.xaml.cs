@@ -41,6 +41,7 @@ public partial class SettingsPage : ContentPage
         if (!string.IsNullOrEmpty(userEmail) && !_emailValidator.IsValid(userEmail))
         {
             await DisplayAlert("Error", "Invaild Email Address!", "OK");
+            _settingsVM.IsApplyButtonEnabled = true;
             return;
         }
 
@@ -48,6 +49,7 @@ public partial class SettingsPage : ContentPage
         if (!(url.StartsWith("https") && url.EndsWith(".git")))
         {
             await DisplayAlert("Error", "Invaild \"Image Repository URL\"!", "OK");
+            _settingsVM.IsApplyButtonEnabled = true;
             return;
         }
 
@@ -55,6 +57,7 @@ public partial class SettingsPage : ContentPage
         if (!Directory.Exists(path))
         {
             await DisplayAlert("Error", "Invaild \"Local Storage Location\"!\nThis Directory is not exist!", "OK");
+            _settingsVM.IsApplyButtonEnabled = true;
             return;
         }
 
@@ -62,6 +65,9 @@ public partial class SettingsPage : ContentPage
         _settingsVM.ApplyChanges();
 
         _settingsVM.IsApplyButtonEnabled = true;
+
+        // ÇÐ»»µ½MainPage
+        await Shell.Current.GoToAsync("//TechTestPage");
     }
 
     private void ColorThemeButtonGroup_SelectedItemChanged(object sender, EventArgs e)

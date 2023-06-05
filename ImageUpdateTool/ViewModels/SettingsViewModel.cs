@@ -25,7 +25,7 @@ namespace ImageUpdateTool.ViewModels
         private string _imageRepositoryURL;
         private string _localStorageLocation;
         
-        private bool _isApplyButtonEnabled;
+        private bool _isApplyButtonEnabled = true;
         #endregion
 
         #region Attributes

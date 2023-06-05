@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:views="clr-namespace:ImageUpdateTool.Views"
+             xmlns:viewModels="clr-namespace:ImageUpdateTool.ViewModels"
              x:Class="ImageUpdateTool.Pages.TechTest"
              Title="TechTest">
     <ContentPage.Resources>
@@ -33,7 +34,6 @@
                 Grid.Row="1">
             <views:FunctionButtons ErrorOccurred="OnErrorOccurred"/>
         </Border>
-        
-       
+
     </Grid>
 </ContentPage>

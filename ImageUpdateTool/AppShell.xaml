@@ -34,7 +34,7 @@
             ContentTemplate="{DataTemplate pages:TechTest}"/>
     </FlyoutItem>
 
-    <FlyoutItem x:Name="LoadingPageItem" Title="LoadingPage" Icon="icon_about.png"
+    <FlyoutItem x:Name="LoadingPageItem" Title="LoadingPage"
                 Route="LoadingPage" IsVisible="False">
         <ShellContent 
             Title="Loadingpage" 
