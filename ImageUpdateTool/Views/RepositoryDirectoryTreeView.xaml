@@ -1,12 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:materials="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Views.RepositoryDirectoryTreeView">
+    <ContentView.Resources>
+        <DataTemplate x:Key="TreeViewTemplate">
+            <Grid RowDefinitions="20" 
+                  ColumnDefinitions="25, 30, *" 
+                  HorizontalOptions="Fill"
+                  Margin="-11, 0, 0, 0">
+                <Label Text="{x:Binding FolderIcon}"
+                       Margin="0"
+                       Grid.Row="0" Grid.Column="1"/>
+                <Label Text="{x:Binding Name}"
+                       FontAttributes="Bold"
+                       VerticalOptions="Start"
+                       Grid.Row="0" Grid.Column="2"/>
+                <Button HorizontalOptions="Fill"
+                        Padding="0"
+                        StyleClass="TextButton"
+                        HeightRequest="20"
+                        WidthRequest="175"
+                        CornerRadius="3"
+                        Command="{x:Binding NodeClickedCommand}"
+                        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                        Margin="{Binding MarginLeft}"
+                        />
+            </Grid>
+        </DataTemplate>
+    </ContentView.Resources>
+    
     <ScrollView Margin="5, 5, 5, 5" >
         <Grid RowSpacing="10" ColumnSpacing="10" Padding="0, 0, 10, 5">
             <Label Text="Tree View" FontSize="Large" TextColor="DimGray"
                    HorizontalOptions="Center"
-                   VerticalOptions="Center"/>
+                   VerticalOptions="Center"
+                   IsVisible="{x:Binding IsLabelVisible}"/>
+
+            <materials:TreeView x:Name="TreeView" 
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                Spacing="4"
+                                ItemTemplate="{StaticResource TreeViewTemplate}"
+                                ItemsSource="{x:Binding Nodes}"
+                                IsExpandedPropertyName="IsExpanded"
+                                IsLeafPropertyName="IsLeaf"/>
         </Grid>
     </ScrollView>
 </ContentView>

@@ -66,6 +66,11 @@ public static class MauiProgram
 			var imageRepositoryModel = IServiceProvider.GetRequiredService<ImageRepositoryModel>();
 			return new FunctionButtonsViewModel(imageRepositoryModel);
 		});
+		builder.Services.AddTransient((IServiceProvider) =>
+		{
+			var imageRepositoryModel = IServiceProvider.GetRequiredService<ImageRepositoryModel>();
+			return new RepositoryDirectoryViewModel(imageRepositoryModel);
+		});
 
 		return builder;
 	}
