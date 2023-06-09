@@ -47,9 +47,33 @@ namespace ImageUpdateTool.ViewModels
         public RepositoryDirectoryViewModel(ImageRepositoryModel model)
         {
             _model = model;
+            _model.OnImageUploaded += ImageRepositoryModel_OnImageUploaded;
+            _model.OnImageRemoved += ImageRepositoryModel_OnImageRemoved;
 
             GenerateTreeNodes();
+            TreeNode.OnNodeClicked += TreeNode_OnNodeClicked;
         }
+
+        #region Event Handlers
+        // TODO: Implement these event handlers
+        private void ImageRepositoryModel_OnImageRemoved(string obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ImageRepositoryModel_OnImageUploaded(string obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void TreeNode_OnNodeClicked(TreeNode node)
+        {
+            if (node.IsLeaf)
+            {
+                _model.CurrentSelectedDirectory = node.Path;
+            }
+        }
+        #endregion
 
         private void GenerateTreeNodes()
         {
@@ -89,6 +113,8 @@ namespace ImageUpdateTool.ViewModels
 
     public class TreeNode : INotifyPropertyChanged
     {
+        public static event Action<TreeNode> OnNodeClicked;
+
         private string _folderIcon = "📁";
         private bool _isExpanded = false;
         private int _layer; // 用于控制缩进
@@ -185,7 +211,7 @@ namespace ImageUpdateTool.ViewModels
             if (IsLeaf)
             {
                 Debug.WriteLine("Leaf node clicked");
-                // TODO
+                OnNodeClicked?.Invoke(this);
             }
             else
             {

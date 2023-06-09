@@ -71,6 +71,11 @@ public static class MauiProgram
 			var imageRepositoryModel = IServiceProvider.GetRequiredService<ImageRepositoryModel>();
 			return new RepositoryDirectoryViewModel(imageRepositoryModel);
 		});
+		builder.Services.AddTransient((IServiceProvider) =>
+		{
+            var imageRepositoryModel = IServiceProvider.GetRequiredService<ImageRepositoryModel>();
+            return new ImageDisplayViewModel(imageRepositoryModel);
+        });
 
 		return builder;
 	}
@@ -88,12 +93,24 @@ public static class MauiProgram
             var mainViewModel = IServiceProvider.GetRequiredService<MainViewModel>();
             return new TechTest(mainViewModel); // TODO:之后重命名成MainPage
         });
-		builder.Services.AddTransient((IServiceProvider) =>
-		{
-			var functionButtonsViewModel = IServiceProvider.GetRequiredService<FunctionButtonsViewModel>();
-			return new FunctionButtons(functionButtonsViewModel);
-		});
-		
+
+		// 这三个是自定义ContentView，但是目前还不支持对它们的DI
+		//builder.Services.AddTransient((IServiceProvider) =>
+		//{
+		//	var functionButtonsViewModel = IServiceProvider.GetRequiredService<FunctionButtonsViewModel>();
+		//	return new FunctionButtons(functionButtonsViewModel);
+		//});
+		//builder.Services.AddTransient((IServiceProvider) =>
+		//{
+		//	var repositoryDirectoryViewModel = IServiceProvider.GetRequiredService<RepositoryDirectoryViewModel>();
+		//	return new RepositoryDirectoryTreeView(repositoryDirectoryViewModel);
+		//});
+		//builder.Services.AddTransient((IServiceProvider) =>
+		//{
+		//	var imageDisplayViewModel = IServiceProvider.GetRequiredService<ImageDisplayViewModel>();
+		//	return new ImageDisplayGrid(imageDisplayViewModel);
+		//});
+
 		return builder;
 	}
 }

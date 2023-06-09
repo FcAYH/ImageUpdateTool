@@ -2,11 +2,42 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ImageUpdateTool.Views.ImageDisplayGrid">
-    <ScrollView Margin="5, 5, 5, 5" >
-        <Grid RowSpacing="10" ColumnSpacing="10" Padding="0, 0, 10, 5">
-            <Label Text="Image Display Area" FontSize="Large" TextColor="DimGray"
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Color x:Key="DeepPurple">#A01c1b1f</Color>
+            <Color x:Key="LightWhite">#A0FFFbFe</Color>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    <Grid>
+        <Label Text="Image Display Area" FontSize="Large" TextColor="DimGray"
+                   Grid.Row="0" Grid.Column="0"
                    HorizontalOptions="Center"
-                   VerticalOptions="Center"/>
+                   VerticalOptions="Center"
+                   IsVisible="{x:Binding IsLabelVisible}"/>
+        
+        <ScrollView Margin="5, 5, 5, 5" Grid.Row="0" Grid.Column="0">
+            <Grid x:Name="DisplayGrid" RowSpacing="10" 
+                  ColumnSpacing="10" Padding="0, 0, 10, 5"
+                  Loaded="ImageDisplayGrid_Loaded"
+                  SizeChanged="ImageDisplayGrid_SizeChanged"
+                  IsVisible="{x:Binding IsDisplayGridVisible}"/>
+        </ScrollView>
+        
+        <Grid x:Name="ImagePreviewArea"
+              Grid.Row="0" Grid.Column="0" 
+              RowDefinitions="*, 30" RowSpacing="15"
+              Padding="20, 20, 20, 60" 
+              IsVisible="{x:Binding IsPreviewing}"
+              BackgroundColor="{x:AppThemeBinding Dark={StaticResource DeepPurple}, Light={StaticResource LightWhite}}">
+            <Image x:Name="PreviewImage" Grid.Row="0"
+                           Source="{x:Binding PreviewImagePath}"/>
+
+            <Button Text="✖" Padding="0" Margin="0" 
+                        HeightRequest="30" WidthRequest="30"
+                        BackgroundColor="Transparent"
+                        Grid.Row="1" Command="{x:Binding ExitPreviewCommand}"
+                        ToolTipProperties.Text="退出预览"/>
         </Grid>
-    </ScrollView>
+    </Grid>
+    
 </ContentView>

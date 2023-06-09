@@ -164,7 +164,7 @@ namespace ImageUpdateTool.Models
         }
 
         /// <summary>
-        /// 当前被选中，用于在<see>TODO</see>中展示的文件夹相对路径
+        /// 当前被选中，用于在<see cref="ImageUpdateTool.Views.ImageDisplayGrid"/>中展示的文件夹绝对路径
         /// </summary>
         public string CurrentSelectedDirectory
         {
@@ -370,6 +370,11 @@ namespace ImageUpdateTool.Models
             }
 
             return string.Empty;
+        }
+
+        public string LocalPathToUrl(string localPath)
+        {
+            return string.Format(URL_FORMAT, UserName, RepoName, localPath);
         }
 
         #region Git-Methods
