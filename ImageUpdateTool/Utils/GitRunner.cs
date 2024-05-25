@@ -11,7 +11,20 @@ namespace ImageUpdateTool.Utils
     internal partial class GitRunner
     {
         public readonly string ExecutablePath = "git";
-        public string WorkingDirectory { get; set; }
+        public string WorkingDirectory
+        {
+            get
+            {
+                return _process != null ? _process.StartInfo.WorkingDirectory : string.Empty;
+            }
+            set
+            {
+                if (_process == null)
+                    return;
+
+                _process.StartInfo.WorkingDirectory = value;
+            }
+        }
 
         private readonly Process _process;
 
@@ -20,12 +33,10 @@ namespace ImageUpdateTool.Utils
 
         public GitRunner(string workingDirectory)
         {
-            if (!Directory.Exists(workingDirectory)) 
+            if (!Directory.Exists(workingDirectory))
             {
                 throw new ArgumentException($"workingDirectory:{workingDirectory} is not exist!");
             }
-
-            WorkingDirectory = workingDirectory;
 
             _process = new Process();
             _process.StartInfo.FileName = ExecutablePath;
@@ -45,7 +56,7 @@ namespace ImageUpdateTool.Utils
             string line;
             string errorMessage = "";
             double lastProgress = 0;
-  
+
             var cts = new CancellationTokenSource(10000);
             while ((line = await _process.StandardError.ReadLineAsync().ConfigureAwait(false)) != null)
             {
@@ -55,7 +66,7 @@ namespace ImageUpdateTool.Utils
                 {
                     var number = double.Parse(match.Groups[1].Value) / 100;
                     progress.Report(number);
-                    
+
                     if (Math.Abs(number - lastProgress) >= 1e-3)
                     {
                         lastProgress = number;
@@ -67,7 +78,7 @@ namespace ImageUpdateTool.Utils
                     // 将非进度信息的标准错误输出信息保存下来，在运行失败后返回
                     errorMessage += line + "\n";
                 }
-                
+
                 // 如果10s内进度没有变化，可能是网络连接断开，杀死进程
                 // 这样做是因为在git clone时断开网络居然不会报错，而是卡住，等网络回复连接后自动继续下载
                 // 但应该是我代码写丑了，使得这种情况会把UI卡死，所以加了一个10s的限制。

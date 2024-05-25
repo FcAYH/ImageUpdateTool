@@ -12,7 +12,7 @@ namespace ImageUpdateTool.ViewModels
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {
-        private AppSettings _appSettings;
+        private readonly AppSettings _appSettings;
 
         // 在页面中修改属性时，并不会直接修改Model的数据，而是在
         // 点击Apply后才会一并修改。
@@ -24,7 +24,7 @@ namespace ImageUpdateTool.ViewModels
         private string _gitUserEmail;
         private string _imageRepositoryURL;
         private string _localStorageLocation;
-        
+
         private bool _isApplyButtonEnabled = true;
         #endregion
 
@@ -69,7 +69,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public string GitUserEmail
         {
             get => _gitUserEmail;
@@ -108,7 +108,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public bool IsApplyButtonEnabled
         {
             get => _isApplyButtonEnabled;
@@ -129,7 +129,7 @@ namespace ImageUpdateTool.ViewModels
         public SettingsViewModel(AppSettings appSettings)
         {
             _appSettings = appSettings;
-           
+
             // 从AppSettings中读取数据
             _imageRepositoryURL = _appSettings.ImageRepositoryURL;
             _localStorageLocation = _appSettings.LocalStorageLocation;

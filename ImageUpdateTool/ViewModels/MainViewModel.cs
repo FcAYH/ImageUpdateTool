@@ -105,7 +105,7 @@ namespace ImageUpdateTool.ViewModels
 
         public async void UpdateSettings()
         {
-            string error = await _model.Initilize();
+            string error = await _model.Initialize();
             if (!string.IsNullOrEmpty(error))
             {
                 // 说明初始化失败，此时应该显示错误信息

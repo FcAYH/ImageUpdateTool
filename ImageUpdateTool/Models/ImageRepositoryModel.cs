@@ -13,11 +13,11 @@ namespace ImageUpdateTool.Models
 {
     public partial class ImageRepositoryModel
     {
-        private const string URL_FORMAT = "https://cdn.jsdelivr.net/gh/{0}/{1}/{2}";
+        private const string URL_FORMAT = "https://cdn.jsdelivr.net/gh/{0}/{1}";
 
         #region Properties
         private readonly AppSettings _settings;
-        
+
         private string _repoGitURL;
         private string _localStorageLocation;
         private string _repoName;
@@ -284,6 +284,13 @@ namespace ImageUpdateTool.Models
                 _modelStatus = ModelStatus.Normal;
             }
 
+            // 如果启动起来发现工作目录不存在，则创建，并 clone 仓库
+            var gitWorkPath = Path.Combine(LocalStorageLocation, RepoName);
+            if (!Directory.Exists(gitWorkPath))
+            {
+                Directory.CreateDirectory(gitWorkPath);
+            }
+
             _git = new GitRunner(Path.Combine(LocalStorageLocation, RepoName));
         }
 
@@ -304,16 +311,16 @@ namespace ImageUpdateTool.Models
             {
                 DirectoryTools.MoveDirectory(lastPath, currentPath);
             }
-            catch 
+            catch
             {
-                // 当url和location同时变化时，这里会接收到一个：DirectoryNotFoundException
-                // 因为在url变化时，将原文件夹删除了，所以这里会找不到原文件夹
-                // 不过无所谓，最后要自检，如果移动不成功会直接在新位置clone
+                // 当 url 和 location 同时变化时，这里会接收到一个：DirectoryNotFoundException
+                // 因为在 url 变化时，将原文件夹删除了，所以这里会找不到原文件夹
+                // 不过无所谓，最后要自检，如果移动不成功会直接在新位置 clone
             }
             finally
             {
                 // 2. 更新_git的工作目录
-                _git.WorkingDirectory = currentPath; // TODO：应该要重新设置userName和email
+                _git.WorkingDirectory = currentPath; // TODO：应该要重新设置 userName 和 email
 
                 // TODO：移除这个事件，更换为自检通过后开启
                 OnLocalStorageLocationChanged?.Invoke(_localStorageLocation);
@@ -323,13 +330,13 @@ namespace ImageUpdateTool.Models
         private void ImageRepositoryURLChanged(string lastUrl)
         {
             // 当图床仓库的URL发生变化时，仅需删除原仓库
-            // 无需clone，
+            // 无需 clone，
             ExtractUserNameAndRepoName(lastUrl, out _, out string lastRepoName);
             string lastRepoPath = Path.Combine(LocalStorageLocation, lastRepoName);
             DirectoryTools.DeleteDirectory(lastRepoPath);
         }
 
-        public async Task<string> Initilize()
+        public async Task<string> Initialize()
         {
             _urlChanged = false;
             _locationChanged = false;
@@ -341,10 +348,10 @@ namespace ImageUpdateTool.Models
             var lastLocation = LocalStorageLocation;
             LocalStorageLocation = _settings.LocalStorageLocation;
 
-            // url和location发生变化要做清除或者迁移的工作
-            // 而不用重新clone，重新clone的工作放在SelfCheck中执行
-            // 只要url发生变化，就要删除原来的仓库
-            // 只要location发生变化，就要将原来的仓库转移到新位置
+            // url 和 location 发生变化要做清除或者迁移的工作
+            // 而不用重新 clone，重新 clone 的工作放在 SelfCheck 中执行
+            // 只要 url 发生变化，就要删除原来的仓库
+            // 只要 location 发生变化，就要将原来的仓库转移到新位置
             if (_urlChanged)
                 ImageRepositoryURLChanged(lastUrl);
             if (_locationChanged)
@@ -354,8 +361,8 @@ namespace ImageUpdateTool.Models
         }
 
         /// <summary>
-        /// 自检，验证当前LocalStorageLocation下有没有Repo，
-        /// 没有的话要重新clone
+        /// 自检，验证当前 LocalStorageLocation 下有没有 Repo，
+        /// 没有的话要重新 clone
         /// </summary>
         private async Task<string> SelfCheck()
         {
@@ -369,12 +376,26 @@ namespace ImageUpdateTool.Models
                 return await CloneRepositoryAsync().ConfigureAwait(false);
             }
 
+            // 检查仓库中是否有 .git 文件夹，如果没有（说明 git 环境被破坏了）
+            // 清空后重新 clone
+
+            string gitFolderPath = Path.Combine(LocalStorageLocation, RepoName, ".git");
+            if (!Directory.Exists(gitFolderPath))
+            {
+                // 清空原仓库
+                DirectoryTools.DeleteDirectory(Path.Combine(LocalStorageLocation, RepoName));
+
+                // 重新 clone
+                return await CloneRepositoryAsync().ConfigureAwait(false);
+            }
+
             return string.Empty;
         }
 
         public string LocalPathToUrl(string localPath)
         {
-            return string.Format(URL_FORMAT, UserName, RepoName, localPath);
+            var relativePath = localPath.Replace(LocalStorageLocation, "").Replace("\\", "/").Trim('/');
+            return string.Format(URL_FORMAT, UserName, relativePath);
         }
 
         #region Git-Methods
@@ -414,7 +435,7 @@ namespace ImageUpdateTool.Models
             }
 
             error = await _git.PushAsync(Progress).ConfigureAwait(false);
-            if (!string.IsNullOrEmpty (error))
+            if (!string.IsNullOrEmpty(error))
             {
                 ModelStatus = ModelStatus.FailToUpload;
                 _gitStatus = GitStatus.FailToPush;
@@ -513,7 +534,7 @@ namespace ImageUpdateTool.Models
             }
 
             ModelStatus = ModelStatus.Normal;
-            _gitStatus= GitStatus.Success;
+            _gitStatus = GitStatus.Success;
             return string.Empty;
         }
 
@@ -524,10 +545,10 @@ namespace ImageUpdateTool.Models
         public async Task<string> RetryAsync()
         {
             // 可能会出现的错误有以下四种：
-            // 1. 上传图片失败 => 可能是Add、Commit、Push失败，需要将失败流程以及其后续流程全部重试
-            // 2. 移除图片失败 => 可能是Remove、Commit、Push失败，需要将失败流程以及其后续流程全部重试
-            // 3. 同步失败 => 可能是Pull、Push失败，需要将失败流程以及其后续流程全部重试
-            // 4. clone操作失败 => 重新clone
+            // 1. 上传图片失败 => 可能是 Add、Commit、Push 失败，需要将失败流程以及其后续流程全部重试
+            // 2. 移除图片失败 => 可能是 Remove、Commit、Push失败，需要将失败流程以及其后续流程全部重试
+            // 3. 同步失败 => 可能是 Pull、Push 失败，需要将失败流程以及其后续流程全部重试
+            // 4. clone 操作失败 => 重新 clone
 
             if (ModelStatus == ModelStatus.FailToUpload)
             {
@@ -644,7 +665,7 @@ namespace ImageUpdateTool.Models
                     return error;
                 }
             }
-            
+
             ModelStatus = ModelStatus.Normal;
             _gitStatus = GitStatus.Success;
 
@@ -653,7 +674,7 @@ namespace ImageUpdateTool.Models
 
         public async Task<string> CloneRepositoryAsync()
         {
-            // 注意clone时，git的工作目录与其他操作不同的
+            // 注意 clone 时，git 的工作目录与其他操作不同的
             _git.WorkingDirectory = LocalStorageLocation;
 
             ModelStatus = ModelStatus.Processing;
@@ -667,7 +688,7 @@ namespace ImageUpdateTool.Models
             ModelStatus = ModelStatus.Normal;
             _gitStatus = GitStatus.Success;
 
-            // 完成clone后，此时要将工作目录切到仓库里面
+            // 完成 clone 后，此时要将工作目录切到仓库里面
             _git.WorkingDirectory = Path.Combine(LocalStorageLocation, RepoName);
             return string.Empty;
         }
@@ -677,7 +698,7 @@ namespace ImageUpdateTool.Models
         [GeneratedRegex("https://[a-zA-Z.]*/([a-zA-Z0-9_-]*)/([a-zA-Z0-9_-]*)\\.git", RegexOptions.Compiled)]
         private static partial Regex UrlRegex();
         private static void ExtractUserNameAndRepoName(string url, out string userName, out string repoName)
-        { 
+        {
             var match = UrlRegex().Match(url);
             if (match.Success)
             {
