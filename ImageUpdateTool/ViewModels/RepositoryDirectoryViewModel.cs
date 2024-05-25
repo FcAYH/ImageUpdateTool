@@ -22,7 +22,7 @@ namespace ImageUpdateTool.ViewModels
         {
             get => _rootNode.Children as ObservableCollection<TreeNode>;
         }
-        
+
         public bool IsLabelVisible
         {
             get => isLabelVisible;
@@ -139,11 +139,12 @@ namespace ImageUpdateTool.ViewModels
         public virtual bool IsExpanded
         {
             get => _isExpanded;
-            private set
+            set
             {
                 if (_isExpanded != value)
                 {
                     _isExpanded = value;
+                    FolderIcon = IsExpanded ? "📂" : "📁";
                     OnPropertyChanged(nameof(IsExpanded));
                 }
             }
@@ -155,7 +156,7 @@ namespace ImageUpdateTool.ViewModels
 
         public Thickness MarginLeft
         {
-            get => _marginLeft; 
+            get => _marginLeft;
             set
             {
                 if (_marginLeft != value)
@@ -210,13 +211,11 @@ namespace ImageUpdateTool.ViewModels
         {
             if (IsLeaf)
             {
-                Debug.WriteLine("Leaf node clicked");
                 OnNodeClicked?.Invoke(this);
             }
             else
             {
                 IsExpanded = !IsExpanded;
-                FolderIcon = IsExpanded ? "📂" : "📁";
             }
         }
     }

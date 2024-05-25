@@ -7,9 +7,9 @@ public partial class LoadingPage : ContentPage
 {
     private readonly AppSettings _settings;
 
-	public LoadingPage(AppSettings appSettings)
-	{
-		InitializeComponent();
+    public LoadingPage(AppSettings appSettings)
+    {
+        InitializeComponent();
         _settings = appSettings;
     }
 
@@ -28,7 +28,7 @@ public partial class LoadingPage : ContentPage
     }
 
     private async Task<bool> SelfTest()
-	{
+    {
         /*
 		 * 运行程序要经过三道检测
 		 * 1. 检测本机是否安装了git
@@ -63,10 +63,9 @@ public partial class LoadingPage : ContentPage
     }
 
     private async void ChooseStartPage()
-	{
-        //await Shell.Current.GoToAsync("//TechTestPage");
-        // 如果图床仓库URL为空，则展示Settings页面，
-        // 否则直接进入Main Page
+    {
+        // 如果图床仓库 URL 为空，则展示 Settings 页面，
+        // 否则直接进入 Main Page
         if (_settings.ImageRepositoryURL == string.Empty)
         {
             await Shell.Current.GoToAsync("//SettingsPage");
@@ -74,7 +73,7 @@ public partial class LoadingPage : ContentPage
         else
         {
             (Shell.Current as AppShell).UnlockMainPage();
-            await Shell.Current.GoToAsync("//TechTestPage");
+            await Shell.Current.GoToAsync("//MainPage");
         }
     }
 }

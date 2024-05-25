@@ -52,7 +52,6 @@ namespace ImageUpdateTool.Utils
             _process.StartInfo.Arguments = arguments;
             _process.Start();
 
-
             string line;
             string errorMessage = "";
             double lastProgress = 0;
@@ -79,9 +78,9 @@ namespace ImageUpdateTool.Utils
                     errorMessage += line + "\n";
                 }
 
-                // 如果10s内进度没有变化，可能是网络连接断开，杀死进程
-                // 这样做是因为在git clone时断开网络居然不会报错，而是卡住，等网络回复连接后自动继续下载
-                // 但应该是我代码写丑了，使得这种情况会把UI卡死，所以加了一个10s的限制。
+                // 如果 10s 内进度没有变化，可能是网络连接断开，杀死进程
+                // 这样做是因为在 git clone 时断开网络居然不会报错，而是卡住，等网络回复连接后自动继续下载
+                // 但应该是我代码写丑了，使得这种情况会把 UI 卡死，所以加了一个 10s 的限制。
                 if (cts.IsCancellationRequested)
                 {
                     errorMessage += "The progress hasn't changed for 10s, maybe the Network Connection is lost!\n";

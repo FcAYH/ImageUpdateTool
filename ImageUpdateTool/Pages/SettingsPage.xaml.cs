@@ -9,13 +9,13 @@ public partial class SettingsPage : ContentPage
     private SettingsViewModel _settingsVM;
     private readonly EmailAddressAttribute _emailValidator = new();
     public SettingsPage(SettingsViewModel settingsVM)
-	{
+    {
         _settingsVM = settingsVM;
         BindingContext = _settingsVM;
 
-		InitializeComponent();
+        InitializeComponent();
         InitializeContent();
-	}
+    }
 
     private void InitializeContent()
     {
@@ -67,7 +67,7 @@ public partial class SettingsPage : ContentPage
         _settingsVM.IsApplyButtonEnabled = true;
 
         // ÇÐ»»µ½MainPage
-        await Shell.Current.GoToAsync("//TechTestPage");
+        await Shell.Current.GoToAsync("//MainPage");
     }
 
     private void ColorThemeButtonGroup_SelectedItemChanged(object sender, EventArgs e)

@@ -29,7 +29,7 @@
             </Grid>
         </DataTemplate>
     </ContentView.Resources>
-    
+
     <ScrollView Margin="5, 5, 5, 5" >
         <Grid RowSpacing="10" ColumnSpacing="10" Padding="0, 0, 10, 5">
             <Label Text="Tree View" FontSize="Large" TextColor="DimGray"
@@ -42,7 +42,8 @@
                                 VerticalOptions="Start"
                                 Spacing="4"
                                 ItemTemplate="{StaticResource TreeViewTemplate}"
-                                ItemsSource="{x:Binding Nodes}"/>
+                                ItemsSource="{x:Binding Nodes}"
+                                IsExpandedPropertyName="IsExpanded"/>
         </Grid>
     </ScrollView>
 </ContentView>

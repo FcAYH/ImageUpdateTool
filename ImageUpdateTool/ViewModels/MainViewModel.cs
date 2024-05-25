@@ -24,7 +24,7 @@ namespace ImageUpdateTool.ViewModels
             get => _progress;
             set
             {
-                if ( _progress != value)
+                if (_progress != value)
                 {
                     _progress = value;
                     OnPropertyChanged(nameof(Progress));
@@ -82,20 +82,20 @@ namespace ImageUpdateTool.ViewModels
         {
             if (status == ModelStatus.Normal)
             {
-                //  Model运行正常，隐藏进度条
+                // Model 运行正常，隐藏进度条
                 IsProgressBarVisible = false;
             }
             else if (status == ModelStatus.Processing)
             {
-                // Model正在运行，显示进度条
+                // Model 正在运行，显示进度条
                 IsProgressBarVisible = true;
             }
             else
             {
-                // Model运行出错，此时会让进度条变红，随后再隐藏
+                // Model 运行出错，此时会让进度条变红，随后再隐藏
                 ErrorOccurred = true;
 
-                // 延迟2.5s后隐藏进度条
+                // 延迟 2.5s 后隐藏进度条
                 Task.Delay(2500).ContinueWith(t =>
                 {
                     IsProgressBarVisible = false;
@@ -108,8 +108,8 @@ namespace ImageUpdateTool.ViewModels
             string error = await _model.Initialize();
             if (!string.IsNullOrEmpty(error))
             {
-                // 说明初始化失败，此时应该显示错误信息
-                // DOing
+                // TODO: 说明初始化失败，此时应该显示错误信息
+
             }
         }
     }

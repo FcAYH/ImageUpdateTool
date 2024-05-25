@@ -1,99 +1,39 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:models="clr-namespace:ImageUpdateTool.Models"
-             xmlns:views="clr-namespace:ImageUpdateTool.Views"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:views="clr-namespace:ImageUpdateTool.Views"
+             xmlns:viewModels="clr-namespace:ImageUpdateTool.ViewModels"
              x:Class="ImageUpdateTool.Pages.MainPage"
-             Title="Github Repo">
-
+             Title="Repository">
     <ContentPage.Resources>
-        <Style TargetType="Button" Class="FunctionButton">
-            <Setter Property="MaximumWidthRequest" Value="200"/>
+        <Style TargetType="Border" x:Key="AreaBorder">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource OutlineVariant}, Dark={StaticResource OutlineVariantDark}}"/>
+            <Setter Property="StrokeThickness" Value="2"/>
+            <Setter Property="StrokeShape" Value="RoundRectangle 10,10,10,10"/>
         </Style>
     </ContentPage.Resources>
-
-    <Grid RowDefinitions="*, 40, 2"  RowSpacing="5"
-          ColumnDefinitions="*, *, *, *, *" ColumnSpacing="10">
-        <ScrollView Grid.Row="0" Grid.Column="0" Margin="5, 5, 5, 5">
-            <material:TreeView x:Name="FolderTree" Spacing="5" Padding="5">
-                <material:TreeView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid RowDefinitions="20" 
-                              ColumnDefinitions="25, 30, 141" 
-                              HorizontalOptions="Fill"
-                              Margin="-19, 0, 0, 0"
-                              >
-                            <Label x:Name="FolderIcon" Text="📁"
-                                   Margin="0"
-                                   Grid.Row="0" Grid.Column="1"/>
-                            <Label Text="{Binding Name}"
-                                   FontAttributes="Bold"
-                                   VerticalOptions="Start"
-                                   Grid.Row="0" Grid.Column="2"/>
-                            <Button HorizontalOptions="Start"
-                                    Padding="0"
-                                    StyleClass="TextButton"
-                                    HeightRequest="20"
-                                    WidthRequest="{Binding ButtonWidthRequest}"
-                                    CornerRadius="3"
-                                    Clicked="FolderButton_Clicked"
-                                    Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                                    />
-                        </Grid>
-                    </DataTemplate>
-                </material:TreeView.ItemTemplate>
-            </material:TreeView>
-        </ScrollView>
-
-        <BoxView Grid.Row="0" Grid.Column="0" 
-                 
-                 VerticalOptions="Fill" 
-                 HorizontalOptions="End"
-                 WidthRequest="1"
-                 Color="{AppThemeBinding Light={StaticResource OutlineVariant}, Dark={StaticResource OutlineVariantDark}}"
-                 Margin="0"
-                 
-                 />
-
-        <ScrollView Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4" Margin="5, 5, 5, 5">
-            <Grid x:Name="ImageDisplayGrid" RowSpacing="10" ColumnSpacing="10" 
-                  Loaded="ImageDisplayGrid_Loaded" Padding="0, 0, 10, 5">
-            
-            </Grid>
-        </ScrollView>   
-        
-        <Button Grid.Row="1" Grid.Column="0" Text="Git Pull" 
-                Clicked="GitPullButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
-                Margin="10, 5, 5, 5"/>
-        <Button Grid.Row="1" Grid.Column="1" Text="Select Image" 
-                Clicked="SelectImageButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
-                Margin="5, 5, 5, 5"/>
-        <Button Grid.Row="1" Grid.Column="2" x:Name="CopyURLButton" Text="Copy URL" 
-                Clicked="CopyUrlButton_Clicked" IsEnabled="False" StyleClass="OutlinedButton ,FunctionButton}"
-                Margin="5, 5, 5, 5"/>
-        <Button Grid.Row="1" Grid.Column="3" x:Name="RetryButton" Text="Retry" 
-                Clicked="OnRetry_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
-                Margin="5, 5, 5, 5"/>
-        <Button Grid.Row="1" Grid.Column="4" x:Name="OpenRepoButton" Text="Open Repo Folder" 
-                Clicked="OnOpenRepoButton_Clicked" StyleClass="OutlinedButton ,FunctionButton}"
-                Margin="5, 5, 10, 5"/>
-
-        <ProgressBar x:Name="GitProgress" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" IsVisible="False"/>
-
-        <!--用于预览图片的区域，默认隐藏-->
-        <Grid x:Name="ImagePreviewArea"
-              Grid.Row="0" Grid.RowSpan="3"
-              Grid.Column="0" Grid.ColumnSpan="5"
-              RowDefinitions="*, 30" RowSpacing="15"
-              Padding="20, 20, 20, 60" IsVisible="False">
-            <Image x:Name="PreviewImage" Grid.Row="0"/>
-
-            <Button Text="✖" Padding="0" Margin="0" 
-                    HeightRequest="30" WidthRequest="30"
-                    BackgroundColor="Transparent"
-                    Grid.Row="1" Clicked="ImagePreviewAreaCloseButton_Clicked"
-                    ToolTipProperties.Text="退出预览"/>
+    <Grid RowDefinitions="*, 60">
+        <Grid ColumnDefinitions="200, *" Grid.Row="0">
+            <Border Style="{x:StaticResource AreaBorder}"
+                    Grid.Column="0">
+                <views:RepositoryDirectoryTreeView/>
+            </Border>
+            <Border Style="{x:StaticResource AreaBorder}" 
+                    Grid.Column="1">
+                <views:ImageDisplayGrid/>
+            </Border>
         </Grid>
+
+        <views:ProgressBar x:Name="ProcessProgress" Grid.Row="1" HeightRequest="50"
+                           Margin="5, 0, 5 ,0" Progress="{x:Binding Progress}" ErrorTrigger="{x:Binding ErrorOccurred}"
+                           IsVisible="{x:Binding IsProgressBarVisible}"/>
+
+        <Border Style="{x:StaticResource AreaBorder}" 
+                Grid.Row="1">
+            <views:FunctionButtons ErrorOccurred="OnErrorOccurred"/>
+        </Border>
+
     </Grid>
 </ContentPage>
