@@ -12,7 +12,7 @@ public class AppSettings
 {
     private const string DEFAULT_ROOT_FOLDER_NAME = "ImageUpdateTool_GitRepos";
 
-    #region Properties
+    #region Fields
     // AppSettings实际会操作的参数就只有AppTheme和Language
     // 剩下的参数AppSettings只负责保存和读取，具体的实现逻辑放在Image Repository Model中
     private AppTheme _colorTheme;
@@ -23,7 +23,7 @@ public class AppSettings
     private string _localStorageLocation; // TODO: 类型待定
     #endregion
 
-    #region Attributes
+    #region Properties
     public AppTheme ColorTheme
     {
         get => _colorTheme;

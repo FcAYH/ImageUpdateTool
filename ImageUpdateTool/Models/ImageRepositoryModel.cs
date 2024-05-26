@@ -15,7 +15,7 @@ namespace ImageUpdateTool.Models
     {
         private const string URL_FORMAT = "https://cdn.jsdelivr.net/gh/{0}/{1}";
 
-        #region Properties
+        #region Fields
         private readonly AppSettings _settings;
 
         private string _repoGitURL;
@@ -23,25 +23,25 @@ namespace ImageUpdateTool.Models
         private string _repoName;
         private string _userName;
         private int _repoSize;
-        private string _latestUploadedImage; // TODO: 类型待定
-        private string _latestRemovedImage; // TODO: 类型待定
+        private string _latestUploadedImage; // 最近上传的图片的相对路径
+        private string _latestRemovedImage; // 最近删除的图片的相对路径
         private ModelStatus _modelStatus;
-        private string _currentSelectedDirectory; // TODO: 类型待定
-        private IProgress<double> _progress; // 用于在git操作时，汇报进度
+        private string _currentSelectedDirectory; // 当前选中的文件夹的绝对路径
+        private IProgress<double> _progress; // 用于在 git 操作时，汇报进度
 
         private GitStatus _gitStatus;
         private GitRunner _git;
         private string _gitUserName;
         private string _gitUserEmail;
 
-        // 仅改变url、仅改变location、同时改变url和location 需要用不同的逻辑处理
+        // 仅改变 url、仅改变 location、同时改变 url 和 location 需要用不同的逻辑处理
         private bool _urlChanged;
         private bool _locationChanged;
         #endregion
 
-        #region Attributes
+        #region Properties
         /// <summary>
-        /// 图床仓库的git URL链接，格式：https://github.com/[UserName]/[RepoName].git
+        /// 图床仓库的 git URL链接，格式：https://github.com/[UserName]/[RepoName].git
         /// </summary>
         public string RepoGitURL
         {
@@ -159,6 +159,23 @@ namespace ImageUpdateTool.Models
                 {
                     _modelStatus = value;
                     OnModelStatusChanged?.Invoke(_modelStatus);
+                    Preferences.Set(nameof(ModelStatus), value.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 记录 git 操作的状态，<see cref="ImageUpdateTool.Utils.GitStatus"/>
+        /// </summary>
+        public GitStatus GitStatus
+        {
+            get => _gitStatus;
+            private set
+            {
+                if (_gitStatus != value)
+                {
+                    _gitStatus = value;
+                    Preferences.Set(nameof(GitStatus), value.ToString());
                 }
             }
         }
@@ -230,7 +247,7 @@ namespace ImageUpdateTool.Models
                 }
                 else
                 {
-                    return string.Format(URL_FORMAT, UserName, RepoName, LatestUploadedImage);
+                    return string.Format(URL_FORMAT, UserName, RepoName + "/" + LatestUploadedImage);
                 }
             }
         }
@@ -255,9 +272,22 @@ namespace ImageUpdateTool.Models
         #endregion
 
         #region Constructors
-        protected ImageRepositoryModel() { }
+        protected ImageRepositoryModel()
+        {
+            var gitStatusStr = Preferences.Get(nameof(GitStatus), GitStatus.Success.ToString());
+            if (!Enum.TryParse(gitStatusStr, out _gitStatus))
+            {
+                _gitStatus = GitStatus.Success;
+            }
 
-        public ImageRepositoryModel(AppSettings settings)
+            var modelStatusStr = Preferences.Get(nameof(ModelStatus), ModelStatus.Normal.ToString());
+            if (!Enum.TryParse(modelStatusStr, out _modelStatus))
+            {
+                _modelStatus = ModelStatus.Normal;
+            }
+        }
+
+        public ImageRepositoryModel(AppSettings settings) : this()
         {
             _settings = settings;
 
@@ -404,7 +434,6 @@ namespace ImageUpdateTool.Models
         /// <para>当ModelStatus不为Normal时，无法调用此方法</para>
         /// </summary>
         /// <param name="path">待上传图片的相对路径</param>
-        /// <param name="progress">用于报告进度</param>
         /// <returns><see cref="string"/>类型, 若上传成功则内容为空，否则内容为错误信息</returns>
         /// <exception cref="ModelProcessingUnderErrorStatus"/>
         public async Task<string> UploadImageAsync(string path)
@@ -451,7 +480,6 @@ namespace ImageUpdateTool.Models
         /// 异步方法，用于移除图片
         /// </summary>
         /// <param name="path">待移除图片的相对路径</param>
-        /// <param name="progress">用于报告进度</param>
         /// <returns><see cref="string"/>类型，若移除成功则内容为空，否则内容为错误信息</returns>
         /// <exception cref="ModelProcessingUnderErrorStatus"/>
         public async Task<string> RemoveImageAsync(string path)
@@ -500,7 +528,6 @@ namespace ImageUpdateTool.Models
         /// <para>注：这里可以缺省<paramref name="needPush"/>参数，取消推送过程，仅拉取，
         /// 因为在正常情况下，所有上传、移除操作都会及时推送，故而无需在此处推送。</para>
         /// </summary>
-        /// <param name="progress">用与报告进度</param>
         /// <param name="needPush">默认为false，仅拉取，若传入值为true，则会在拉取后推送</param>
         /// <returns><see cref="string"/>类型，若同步成功则内容为空，否则内容为错误信息</returns>
         /// <exception cref="ModelProcessingUnderErrorStatus"/>

@@ -16,8 +16,8 @@ public class Settings
     /// <summary>
     /// 当前软件使用的颜色主题
     /// </summary>
-    public AppTheme CurrentTheme 
-    { 
+    public AppTheme CurrentTheme
+    {
         get
         {
             if (string.IsNullOrEmpty(_currentTheme))
@@ -33,23 +33,23 @@ public class Settings
             catch { }
 
             return currentTheme;
-        } 
+        }
         set
         {
             _currentTheme = value.ToString();
             Application.Current.UserAppTheme = value;
             Preferences.Set(nameof(CurrentTheme), _currentTheme);
-        } 
-    }   
+        }
+    }
 
     /// <summary>
-    /// 当前软件所管理的图床的git Web URL
+    /// 当前软件所管理的图床的 git Web URL
     /// </summary>
     public string GitURL
     {
         get
         {
-            if (string.IsNullOrEmpty(_gitURL)) 
+            if (string.IsNullOrEmpty(_gitURL))
             {
                 _gitURL = Preferences.Get(nameof(GitURL), string.Empty);
             }
@@ -64,13 +64,13 @@ public class Settings
     }
 
     /// <summary>
-    /// 当前软件用于在本地存储git仓库的目录
+    /// 当前软件用于在本地存储 git 仓库的目录
     /// </summary>
-    public string LocalStoragePath 
+    public string LocalStoragePath
     {
         get
-        { 
-            if (string.IsNullOrEmpty(_localStoragePath)) 
+        {
+            if (string.IsNullOrEmpty(_localStoragePath))
             {
                 _localStoragePath = Preferences.Get(nameof(LocalStoragePath), string.Empty);
             }
@@ -89,14 +89,14 @@ public class Settings
             _localStoragePath = value;
             Preferences.Set(nameof(LocalStoragePath), _localStoragePath);
         }
-    
+
     }
 
     private string _currentTheme = string.Empty;
     private string _gitURL = string.Empty;
     private string _localStoragePath = string.Empty;
 
-    public Settings() 
+    public Settings()
     {
         Application.Current.UserAppTheme = CurrentTheme;
     }

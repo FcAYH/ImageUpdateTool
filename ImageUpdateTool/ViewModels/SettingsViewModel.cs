@@ -17,7 +17,7 @@ namespace ImageUpdateTool.ViewModels
         // 在页面中修改属性时，并不会直接修改Model的数据，而是在
         // 点击Apply后才会一并修改。
 
-        #region Properties
+        #region Fields
         private AppTheme _colorTheme;
         private Language _language;
         private string _gitUserName;
@@ -28,7 +28,7 @@ namespace ImageUpdateTool.ViewModels
         private bool _isApplyButtonEnabled = true;
         #endregion
 
-        #region Attributes
+        #region Properties
         public AppTheme ColorTheme
         {
             get => _colorTheme;

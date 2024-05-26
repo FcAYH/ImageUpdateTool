@@ -44,7 +44,7 @@ namespace ImageUpdateTool.Utils
             _process.StartInfo.RedirectStandardOutput = true;
             _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.UseShellExecute = false;
-            _process.StartInfo.WorkingDirectory = WorkingDirectory;
+            _process.StartInfo.WorkingDirectory = workingDirectory;
         }
 
         private async Task<string> RunAsync(string arguments, IProgress<double> progress = null)

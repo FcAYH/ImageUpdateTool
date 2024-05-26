@@ -18,7 +18,7 @@ namespace ImageUpdateTool.ViewModels
     {
         private ImageRepositoryModel _model;
 
-        #region Properties
+        #region Fields
         private bool _isSyncRemoteButtonEnabled = true;
         private bool _isUploadImageButtonEnabled = true;
         private bool _isCopyUrlButtonEnabled = false;
@@ -33,7 +33,7 @@ namespace ImageUpdateTool.ViewModels
         private Command _openLocalDirectoryCommand;
         #endregion
 
-        #region Attributes
+        #region Properties
         public bool IsSyncRemoteButtonEnabled
         {
             get => _isSyncRemoteButtonEnabled;
@@ -46,7 +46,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public bool IsUploadImageButtonEnabled
         {
             get => _isUploadImageButtonEnabled;
@@ -59,7 +59,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public bool IsCopyUrlButtonEnabled
         {
             get => _isCopyUrlButtonEnabled;
@@ -72,7 +72,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public bool IsRetryButtonEnabled
         {
             get => _isRetryButtonEnabled;
@@ -85,7 +85,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public bool IsOpenLocalDirectoryButtonEnabled
         {
             get => _isOpenLocalDirectoryButtonEnabled;
@@ -98,7 +98,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public string CopyUrlButtonTooltip
         {
             get => _copyUrlButtonTooltip;
@@ -111,7 +111,7 @@ namespace ImageUpdateTool.ViewModels
                 }
             }
         }
-        
+
         public Command SyncRemoteButtonCommand
         {
             get
@@ -169,8 +169,8 @@ namespace ImageUpdateTool.ViewModels
         #endregion
 
         public FunctionButtonsViewModel() { }
-        public FunctionButtonsViewModel(ImageRepositoryModel model) 
-        { 
+        public FunctionButtonsViewModel(ImageRepositoryModel model)
+        {
             _model = model;
             _model.OnModelStatusChanged += ImageRepositoryModel_OnModelStatusChanged;
             _model.OnImageUploaded += ImageRepositoryModel_OnImageUploaded;
@@ -180,7 +180,7 @@ namespace ImageUpdateTool.ViewModels
         private async void SyncRemoteButtonCommandExecute()
         {
             var error = await _model.SyncWithRemoteAsync();
-            if (!string.IsNullOrEmpty(error)) 
+            if (!string.IsNullOrEmpty(error))
             {
                 OnErrorOccurred?.Invoke(new ErrorEventArgs(error, "SyncRemote"));
             }
@@ -228,7 +228,7 @@ namespace ImageUpdateTool.ViewModels
         {
             await Clipboard.SetTextAsync(_model.LatestUploadedImageUrl);
         }
-        
+
         private async void RetryButtonCommandExecute()
         {
             var error = await _model.RetryAsync();
@@ -237,7 +237,7 @@ namespace ImageUpdateTool.ViewModels
                 OnErrorOccurred?.Invoke(new ErrorEventArgs(error, "Retry"));
             }
         }
-        
+
         private void OpenLocalDirectoryButtonCommandExecute()
         {
             Process.Start("explorer.exe", _model.LocalStorageLocation);

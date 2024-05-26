@@ -15,6 +15,7 @@ namespace ImageUpdateTool.ViewModels
     {
         private readonly ImageRepositoryModel _model;
 
+        #region Fields
         private bool _isLabelVisible = true;
         private bool _isDisplayGridVisible = false;
         private bool _isPreviewing = false;
@@ -25,6 +26,10 @@ namespace ImageUpdateTool.ViewModels
 
         private string _currentSelectedDirectory = string.Empty;
         private List<ImageArea> _imageList;
+
+        #endregion
+
+        #region Properties
         public List<ImageArea> ImageList => _imageList;
 
         public bool IsLabelVisible
@@ -112,6 +117,8 @@ namespace ImageUpdateTool.ViewModels
             }
         }
 
+        #endregion
+
         public event Action OnImageListChanged;
 
         #region INotifyPropertyChanged
@@ -168,9 +175,9 @@ namespace ImageUpdateTool.ViewModels
             }
         }
 
-        private void ImageArea_OnImageDeleted(string obj)
+        private void ImageArea_OnImageDeleted(string relativePath)
         {
-            throw new NotImplementedException();
+            _ = _model.RemoveImageAsync(relativePath);
         }
 
         private void ImageArea_OnImageClicked(string path)
