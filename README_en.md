@@ -1,6 +1,6 @@
 # ImageUpdateTool
 
-[Chinese version](README.md)
+> [简体中文版本](README.md)
 
 This is a tool to maintain the Github image bed. Just like PicGo (but the function is definitely not as powerful as PicGo).
 
@@ -24,13 +24,18 @@ The basic functions of this software are just in a state that can be used :joy:
 
 TODO:
 
-- [x] git clone/push/pull asynchronous
-- [x] Preview image function
-- [x] Delete image function
-- [ ] Progress bar
-- [ ] Multilingual support
+Function:
+
+- [ ] Use a progress bar to display the progress when uploading, synchronizing, and deleting images
 - [ ] Drag and drop upload
-- [ ] The main interface ctrl + v can directly upload the content of the clipboard
-- [ ] Support for functions that do not need to maintain the repository locally
+- [ ] Press ctrl + v on the main interface to directly upload the content of the clipboard
+- [ ] Multi-language support
+- [ ] Add right-click menu for png, jpeg and other image formats to upload in one click
+
+Experience optimization:
+
+- [ ] Asynchronous loading of images
+- [ ] Support zooming with the mouse wheel when previewing images
 - [ ] Optimize memory usage
-- [ ] Add right-click menu for png, jpeg and other image formats, one-click upload
+- [ ] Optimize the refresh logic of TreeView after uploading and deleting images
+
