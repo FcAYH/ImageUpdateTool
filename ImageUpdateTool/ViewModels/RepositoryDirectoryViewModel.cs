@@ -55,15 +55,16 @@ namespace ImageUpdateTool.ViewModels
         }
 
         #region Event Handlers
-        // TODO: Implement these event handlers
         private void ImageRepositoryModel_OnImageRemoved(string relativePath)
         {
             GenerateTreeNodes();
+            OnPropertyChanged(nameof(Nodes));
         }
 
         private void ImageRepositoryModel_OnImageUploaded(string relativePath)
         {
             GenerateTreeNodes();
+            OnPropertyChanged(nameof(Nodes));
         }
 
         private void TreeNode_OnNodeClicked(TreeNode node)
