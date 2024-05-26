@@ -5,14 +5,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:pages="clr-namespace:ImageUpdateTool.Pages">
 
-    <FlyoutItem x:Name="MainPageItem" Title="Repos" Icon="icon_notes.png" 
+    <FlyoutItem x:Name="MainPageItem" Title="Repository" Icon="icon_notes.png" 
                 IsEnabled="false" IsVisible="False"
                 Route="MainPage">
         <ShellContent
-            Title="Github"
+            Title="Repository"
             ContentTemplate="{DataTemplate pages:MainPage}"/>
     </FlyoutItem>
-
 
     <FlyoutItem x:Name="SettingsPageItem" Title="Settings" Icon="icon_about.png"
                 Route="SettingsPage">
@@ -22,16 +21,16 @@
     </FlyoutItem>
 
     <FlyoutItem x:Name="AboutPageItem" Title="About" Icon="icon_about.png"
-                Route="AboutPage">
+                Route="About">
         <ShellContent 
             Title="About" 
             ContentTemplate="{DataTemplate pages:AboutPage}"/>
     </FlyoutItem>
 
-    <FlyoutItem Title="TechTest" Icon="icon_about.png"
-                Route="TechTestPage">
+    <FlyoutItem x:Name="LoadingPageItem" Title="LoadingPage"
+                Route="LoadingPage" IsVisible="False">
         <ShellContent 
-            Title="TechTest" 
-            ContentTemplate="{DataTemplate pages:TechTest}"/>
+            Title="Loading" 
+            ContentTemplate="{DataTemplate pages:LoadingPage}"/>
     </FlyoutItem>
 </Shell>

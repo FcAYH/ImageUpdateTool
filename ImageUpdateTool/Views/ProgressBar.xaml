@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:materials="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             x:Class="ImageUpdateTool.Views.ProgressBar">
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Color x:Key="LightGreen">#33DA53</Color>
+            <Color x:Key="DarkGreen">#8671FF</Color>
+        </ResourceDictionary>
+    </ContentView.Resources>
+    <Grid ColumnDefinitions="*">
+        <Label x:Name="BackgroundLabel" HorizontalOptions="Fill" BackgroundColor="Transparent"
+               SizeChanged="BackgroundLabel_SizeChanged"/>
+        <Border x:Name="ProgressBorder" Grid.Column="0" HorizontalOptions="Start"
+                Stroke="{AppThemeBinding Light={StaticResource OutlineVariant}, Dark={StaticResource OutlineVariantDark}}"
+                StrokeLineCap="Round" StrokeThickness="1" 
+                Opacity="0.4"
+                BackgroundColor="{AppThemeBinding Light={StaticResource LightGreen}, Dark={StaticResource DarkGreen}}"
+                StrokeShape="RoundRectangle 10,10,10,10" Padding="0">
+            <Label x:Name="ProgressLabel" WidthRequest="500"/>
+        </Border>
+    </Grid>
+</ContentView>

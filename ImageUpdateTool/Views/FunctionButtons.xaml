@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:viewModels="clr-namespace:ImageUpdateTool.ViewModels"
+             x:Class="ImageUpdateTool.Views.FunctionButtons">
+    <ContentView.Resources>
+        <Style TargetType="Button" x:Key="FuntionButton">
+            <Setter Property="Padding" Value="0, 0, 0, 0"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+    </ContentView.Resources>
+    <Grid ColumnDefinitions="*, *, *, *, *" ColumnSpacing="5"
+          Margin="5, 0, 5, 0">
+        <Button Text="Sync Remote" Style="{StaticResource FuntionButton}" StyleClass="TextButton"
+                Grid.Column="0" Command="{x:Binding SyncRemoteButtonCommand}"
+                IsEnabled="{x:Binding IsSyncRemoteButtonEnabled}"/>
+        <Button Text="Upload Image" Style="{StaticResource FuntionButton}" StyleClass="TextButton"
+                Grid.Column="1" Command="{x:Binding UploadImageButtonCommand}"
+                IsEnabled="{x:Binding IsUploadImageButtonEnabled}"/>
+        <Button Text="Copy URL" Style="{StaticResource FuntionButton}" StyleClass="TextButton"
+                Grid.Column="2" Command="{x:Binding CopyUrlButtonCommand}"
+                IsEnabled="{x:Binding IsCopyUrlButtonEnabled}"
+                ToolTipProperties.Text="{x:Binding CopyUrlButtonTooltip}"/>
+        <Button Text="Retry" Style="{StaticResource FuntionButton}" StyleClass="TextButton"
+                Grid.Column="3" Command="{x:Binding RetryButtonCommand}"
+                IsEnabled="{x:Binding IsRetryButtonEnabled}"/>
+        <Button Text="Open Local Directory" Style="{StaticResource FuntionButton}" StyleClass="TextButton"
+                Grid.Column="4" Command="{x:Binding OpenLocalDirectoryButtonCommand}"
+                IsEnabled="{x:Binding IsOpenLocalDirectoryButtonEnabled}"/>
+    </Grid>
+</ContentView>
