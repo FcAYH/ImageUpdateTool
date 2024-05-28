@@ -5,16 +5,16 @@ namespace ImageUpdateTool.Views;
 
 public partial class ProgressBar : ContentView
 {
-	public static BindableProperty ProgressProperty  = BindableProperty.Create(
-		        nameof(Progress), typeof(double), typeof(ProgressBar), 0.0,
-				propertyChanged: (bindable, oldValue, newValue) =>
-				{
-					var progressBar = (ProgressBar)bindable;
+    public static BindableProperty ProgressProperty = BindableProperty.Create(
+                nameof(Progress), typeof(double), typeof(ProgressBar), 0.0,
+                propertyChanged: (bindable, oldValue, newValue) =>
+                {
+                    var progressBar = (ProgressBar)bindable;
 
-					// 根据BackgroundLabel的长度，和Progress的值，改变ProgressLabel的长度
-					progressBar.ProgressLabel.WidthRequest = (double)newValue * progressBar.BackgroundLabel.Width;
-				}
-			);
+                    // 根据BackgroundLabel的长度，和Progress的值，改变ProgressLabel的长度
+                    progressBar.ProgressLabel.WidthRequest = (double)newValue * progressBar.BackgroundLabel.Width;
+                }
+            );
 
     public static BindableProperty ErrorTriggerProperty = BindableProperty.Create(
                 nameof(ErrorTrigger), typeof(bool), typeof(ProgressBar), false,
@@ -28,8 +28,8 @@ public partial class ProgressBar : ContentView
                 }
             );
 
-	public double Progress
-	{
+    public double Progress
+    {
         get => (double)GetValue(ProgressProperty);
         set => SetValue(ProgressProperty, value);
     }
@@ -40,16 +40,14 @@ public partial class ProgressBar : ContentView
         set => SetValue(ErrorTriggerProperty, value);
     }
 
-	public ProgressBar()
-	{
-		InitializeComponent();
-		Debug.WriteLine(BackgroundLabel.Width);
-		Debug.WriteLine(Progress);
-	}
+    public ProgressBar()
+    {
+        InitializeComponent();
+    }
 
     private void BackgroundLabel_SizeChanged(object sender, EventArgs e)
     {
-		ProgressLabel.WidthRequest = Progress * BackgroundLabel.Width;
+        ProgressLabel.WidthRequest = Progress * BackgroundLabel.Width;
     }
 
     private async void OnErrorOccurred()
@@ -65,7 +63,7 @@ public partial class ProgressBar : ContentView
         // Create an animation that changes the background color of the label back to original color
         var reverseAnimation = new Animation(v => ProgressBorder.BackgroundColor = Blend(originalColor, Colors.Red, v), 1, 0);
         reverseAnimation.Commit(this, "ColorAnimation", 16, 500);
-        
+
         ErrorTrigger = false;
     }
 

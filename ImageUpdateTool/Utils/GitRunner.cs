@@ -49,6 +49,11 @@ namespace ImageUpdateTool.Utils
 
         private async Task<string> RunAsync(string arguments, IProgress<double> progress = null)
         {
+            if (progress != null)
+            {
+                arguments += " --progress";
+            }
+
             _process.StartInfo.Arguments = arguments;
             _process.Start();
 

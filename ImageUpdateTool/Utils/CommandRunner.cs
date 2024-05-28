@@ -28,7 +28,6 @@ internal class CommandRunner
         {
             if (runner._process != null)
             {
-                Debug.WriteLine(runner._process.Id);
                 runner._process.Kill();
             }
         }
@@ -52,7 +51,7 @@ internal class CommandRunner
         _process.WaitForExit();
         if (_process.ExitCode == 0)
             return "";
-                
+
         return _process.StandardError.ReadToEnd();
     }
 
@@ -79,7 +78,6 @@ internal class CommandRunner
         var cts = new CancellationTokenSource(10000);
         while ((line = await _process.StandardError.ReadLineAsync().ConfigureAwait(false)) != null)
         {
-            Debug.WriteLine(line);
             // Extract the progress data from the line
             var match = Regex.Match(line, @"(\d+)%");
             // Check if the match is successful

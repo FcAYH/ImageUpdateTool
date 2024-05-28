@@ -3,6 +3,7 @@ using ImageUpdateTool.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -72,6 +73,7 @@ namespace ImageUpdateTool.ViewModels
             _progressValue = new Progress<double>(value =>
             {
                 Progress = value;
+                Debug.WriteLine("Progress Value: " + value);
             });
 
             _model.Progress = _progressValue;
