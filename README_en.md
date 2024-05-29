@@ -26,7 +26,7 @@ TODO:
 
 Function:
 
-- [ ] Use a progress bar to display the progress when uploading, synchronizing, and deleting images
+- [x] Use a progress bar to display the progress when uploading, synchronizing, and deleting images
 - [ ] Drag and drop upload
 - [ ] Press ctrl + v on the main interface to directly upload the content of the clipboard
 - [ ] Multi-language support
