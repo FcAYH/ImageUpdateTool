@@ -7,14 +7,16 @@
         <DataTemplate x:Key="TreeViewTemplate">
             <Grid RowDefinitions="20" 
                   ColumnDefinitions="25, 30, *" 
-                  HorizontalOptions="Fill"
-                  Margin="-11, 0, 0, 0">
+                  HorizontalOptions="FillAndExpand"
+                  Margin="-11, 0, 0, 0"
+                  IsClippedToBounds="False">
                 <Label Text="{x:Binding FolderIcon}"
                        Margin="0"
                        Grid.Row="0" Grid.Column="1"/>
                 <Label Text="{x:Binding Name}"
                        FontAttributes="Bold"
                        VerticalOptions="Start"
+                       HorizontalOptions="Start"
                        Grid.Row="0" Grid.Column="2"/>
                 <Button HorizontalOptions="Fill"
                         Padding="0"
@@ -31,7 +33,7 @@
     </ContentView.Resources>
 
     <ScrollView Margin="5, 5, 5, 5" >
-        <Grid RowSpacing="10" ColumnSpacing="10" Padding="0, 0, 10, 5">
+        <Grid Padding="0, 0, 0, 5">
             <Label Text="Tree View" FontSize="Large" TextColor="DimGray"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
@@ -43,7 +45,9 @@
                                 Spacing="4"
                                 ItemTemplate="{StaticResource TreeViewTemplate}"
                                 ItemsSource="{x:Binding Nodes}"
-                                IsExpandedPropertyName="IsExpanded"/>
+                                IsExpandedPropertyName="IsExpanded"
+                                SelectionMode="Single"
+                                IsClippedToBounds="False"/>
         </Grid>
     </ScrollView>
 </ContentView>
