@@ -58,13 +58,11 @@ namespace ImageUpdateTool.ViewModels
         private void ImageRepositoryModel_OnImageRemoved(string relativePath)
         {
             GenerateTreeNodes();
-            OnPropertyChanged(nameof(Nodes));
         }
 
         private void ImageRepositoryModel_OnImageUploaded(string relativePath)
         {
             GenerateTreeNodes();
-            OnPropertyChanged(nameof(Nodes));
         }
 
         private void TreeNode_OnNodeClicked(TreeNode node)
@@ -109,6 +107,8 @@ namespace ImageUpdateTool.ViewModels
                     current.IsLeaf = current.Children.Count == 0;
                 }
             }
+
+            OnPropertyChanged(nameof(Nodes));
         }
     }
 
@@ -205,7 +205,7 @@ namespace ImageUpdateTool.ViewModels
             Path = path;
             _layer = layer;
 
-            MarginLeft = new Thickness(-10 * _layer, 0, 0, 0);
+            MarginLeft = new Thickness(-10 - (16 * (_layer - 1)), 0, 0, 0);
         }
 
         private void OnNodeButton_Clicked()

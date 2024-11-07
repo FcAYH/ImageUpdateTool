@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="ImageUpdateTool.Views.ImageArea">
-    <VerticalStackLayout HeightRequest="150" WidthRequest="200">
+    <VerticalStackLayout HeightRequest="160" WidthRequest="220">
         <ImageButton x:Name="Image"  HeightRequest="120" Margin="5"
                      Clicked="Image_Clicked" Aspect="AspectFit"
                      HorizontalOptions="Center" VerticalOptions="Center"/>
